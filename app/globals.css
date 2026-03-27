@@ -4,85 +4,20 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Playful party palette */
-  --background: #FFF8E7;
-  --foreground: #2D1B4E;
-  --card: #FFE4B5;
-  --card-foreground: #2D1B4E;
-  --popover: #FFF8E7;
-  --popover-foreground: #2D1B4E;
+  /* Vibrant party palette */
+  --background: #1a1a1a;
+  --foreground: #FFFFFF;
   --primary: #FF6B35;
-  --primary-foreground: #FFFFFF;
   --secondary: #4ECDC4;
-  --secondary-foreground: #FFFFFF;
-  --muted: #FFE4B5;
-  --muted-foreground: #6B4E8E;
   --accent: #FFE66D;
-  --accent-foreground: #2D1B4E;
-  --destructive: #FF6B6B;
-  --destructive-foreground: #FFFFFF;
-  --border: #FF6B35;
-  --input: #FFE4B5;
-  --ring: #FF6B35;
-  --chart-1: #FF6B35;
-  --chart-2: #4ECDC4;
-  --chart-3: #FFE66D;
-  --chart-4: #95E1D3;
-  --chart-5: #F38181;
-  --radius: 1rem;
-  
-  /* Custom party colors */
+  --purple: #B8368D;
+  --pink: #E84B8A;
   --orange: #FF6B35;
-  --yellow: #FFE66D;
-  --teal: #4ECDC4;
-  --pink: #F38181;
-  --sky: #87CEEB;
-  --green: #95E1D3;
-  --cream: #FFF8E7;
-  --purple: #6B4E8E;
 }
 
 @theme inline {
   --font-sans: var(--font-fredoka), 'Fredoka', sans-serif;
   --font-mono: 'Geist Mono', 'Geist Mono Fallback';
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  
-  /* Party colors */
-  --color-orange: var(--orange);
-  --color-yellow: var(--yellow);
-  --color-teal: var(--teal);
-  --color-pink: var(--pink);
-  --color-sky: var(--sky);
-  --color-green: var(--green);
-  --color-cream: var(--cream);
-  --color-purple: var(--purple);
 }
 
 @layer base {
