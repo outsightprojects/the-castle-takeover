@@ -11,7 +11,7 @@ export default function Home() {
     { label: 'HOME', href: '/' },
     { label: 'ABOUT', href: '/about' },
     { label: 'VENUE', href: '/venue' },
-    { label: 'TICKETS', href: '/tickets' },
+    { label: 'RSVP', href: '/tickets' },
     { label: "FAQ'S", href: '/faqs' },
   ]
 
@@ -76,9 +76,12 @@ export default function Home() {
             </div>
 
             {/* CTA Button */}
-            <button className="bg-[#FFE135] text-[#2D4A3E] font-bold text-lg px-8 py-4 rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 border-2 border-[#2D4A3E]">
+            <Link 
+              href="/tickets"
+              className="inline-block bg-[#FFE135] text-[#2D4A3E] font-bold text-lg px-8 py-4 rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 border-2 border-[#2D4A3E]"
+            >
               Reserve Now
-            </button>
+            </Link>
           </div>
         </div>
       </main>
