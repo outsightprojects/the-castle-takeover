@@ -1,14 +1,23 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Fredoka, Comic_Neue } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const fredoka = Fredoka({ 
+  subsets: ["latin"],
+  variable: '--font-fredoka',
+  weight: ['300', '400', '500', '600', '700'],
+});
+
+const comicNeue = Comic_Neue({ 
+  subsets: ["latin"],
+  variable: '--font-comic',
+  weight: ['300', '400', '700'],
+});
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
+  title: 'The Castle Takeover - 40th Birthday Bash',
+  description: 'Cari, Peter & Georg celebrate their 40th birthday at Schloss Dornburg. 28-30 Aug 2026. Join us for an unforgettable castle party!',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -36,7 +45,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased">
+      <body className={`${fredoka.variable} ${comicNeue.variable} font-sans antialiased`}>
         {children}
         <Analytics />
       </body>

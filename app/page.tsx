@@ -1,16 +1,21 @@
+import { HeroSection } from "@/components/hero-section"
+import { LocationSection } from "@/components/location-section"
+import { TravelSection } from "@/components/travel-section"
+import { MapSection } from "@/components/map-section"
+import { ArrivalNotes } from "@/components/arrival-notes"
+import { Footer } from "@/components/footer"
+import { StickyNav } from "@/components/sticky-nav"
+
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center font-sans">
-      <main className="flex w-full max-w-3xl flex-col items-center gap-8 px-6 py-16 text-center sm:items-start sm:text-left">
-        <div className="flex flex-col gap-4">
-          <h1 className="text-4xl font-bold tracking-tight">
-            The Castle Takeover
-          </h1>
-          <p className="max-w-md text-lg text-muted-foreground">
-            To get started, send a prompt or modify this page directly.
-          </p>
-        </div>
-      </main>
+    <div className="min-h-screen bg-[#FFF8E7]">
+      <HeroSection />
+      <LocationSection />
+      <TravelSection />
+      <MapSection />
+      <ArrivalNotes />
+      <Footer />
+      <StickyNav />
     </div>
-  );
+  )
 }
