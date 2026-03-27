@@ -1,11 +1,8 @@
-/* Castle Takeover */
-@import "tailwindcss/preflight" layer(base);
-@import "tailwindcss/theme" layer(theme);
-@import "tailwindcss/utilities" layer(utilities);
+@import "tailwindcss";
 
 @custom-variant dark (&:is(.dark *));
 
-@theme inline {
+@theme {
   --font-sans: var(--font-fredoka), 'Fredoka', sans-serif;
   --font-mono: 'Geist Mono', 'Geist Mono Fallback';
   --color-background: #FDEAE0;
@@ -31,14 +28,4 @@
   --radius-md: 0.5rem;
   --radius-lg: 0.625rem;
   --radius-xl: 0.75rem;
-}
-
-@layer base {
-  * {
-    border-color: var(--color-border);
-  }
-  body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
-  }
 }
