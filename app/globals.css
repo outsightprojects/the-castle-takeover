@@ -18,6 +18,10 @@
 @theme inline {
   --font-sans: var(--font-fredoka), 'Fredoka', sans-serif;
   --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --color-border: #e5e5e5;
+  --color-ring: #2D4A3E;
+  --color-background: #FDEAE0;
+  --color-foreground: #2D4A3E;
 }
 
 @layer base {
