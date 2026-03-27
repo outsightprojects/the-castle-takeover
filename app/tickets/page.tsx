@@ -273,7 +273,16 @@ export default function RSVPPage() {
                           name="arrivalDay"
                           value={option.value}
                           checked={formData.arrivalDay === option.value}
-                          onChange={(e) => setFormData({ ...formData, arrivalDay: e.target.value })}
+                          onChange={(e) => {
+                            const newArrival = e.target.value
+                            // Clear two-nights if switching to Saturday since it's not available
+                            const invalidCombo = newArrival === 'saturday' && formData.stayDuration === 'two-nights'
+                            setFormData({ 
+                              ...formData, 
+                              arrivalDay: newArrival,
+                              stayDuration: invalidCombo ? '' : formData.stayDuration,
+                            })
+                          }}
                           className="sr-only"
                         />
                         <span className="font-semibold text-sm">{option.label}</span>
@@ -286,31 +295,42 @@ export default function RSVPPage() {
                   <label className="block text-white font-semibold mb-3">How long will you stay?</label>
                   <div className="grid grid-cols-2 gap-3">
                     {[
-                      { value: 'day-only', label: 'Just for the day' },
-                      { value: 'one-night', label: 'One night' },
-                      { value: 'two-nights', label: 'Two nights' },
-                      { value: 'unsure-stay', label: 'Not sure yet' },
-                    ].map((option) => (
-                      <label
-                        key={option.value}
-                        className={`text-center p-3 rounded-xl cursor-pointer transition-all ${
-                          formData.stayDuration === option.value
-                            ? 'bg-[#FFE135] text-[#2D4A3E] border-2 border-[#2D4A3E]'
-                            : 'bg-white/20 text-white border-2 border-transparent hover:bg-white/30'
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="stayDuration"
-                          value={option.value}
-                          checked={formData.stayDuration === option.value}
-                          onChange={(e) => setFormData({ ...formData, stayDuration: e.target.value })}
-                          className="sr-only"
-                        />
-                        <span className="font-semibold text-sm">{option.label}</span>
-                      </label>
-                    ))}
+                      { value: 'day-only', label: 'Just for the day', disabledWhen: [] },
+                      { value: 'one-night', label: 'One night', disabledWhen: [] },
+                      { value: 'two-nights', label: 'Two nights (Fri–Sun)', disabledWhen: ['saturday'] },
+                      { value: 'unsure-stay', label: 'Not sure yet', disabledWhen: [] },
+                    ].map((option) => {
+                      const isDisabled = option.disabledWhen.includes(formData.arrivalDay)
+                      return (
+                        <label
+                          key={option.value}
+                          className={`text-center p-3 rounded-xl transition-all ${
+                            isDisabled
+                              ? 'opacity-30 cursor-not-allowed bg-white/10 border-2 border-transparent'
+                              : formData.stayDuration === option.value
+                              ? 'bg-[#FFE135] text-[#2D4A3E] border-2 border-[#2D4A3E] cursor-pointer'
+                              : 'bg-white/20 text-white border-2 border-transparent hover:bg-white/30 cursor-pointer'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="stayDuration"
+                            value={option.value}
+                            checked={formData.stayDuration === option.value}
+                            disabled={isDisabled}
+                            onChange={(e) => setFormData({ ...formData, stayDuration: e.target.value })}
+                            className="sr-only"
+                          />
+                          <span className="font-semibold text-sm">{option.label}</span>
+                        </label>
+                      )
+                    })}
                   </div>
+                  {formData.arrivalDay === 'saturday' && (
+                    <p className="mt-3 text-[#FFE135] text-sm">
+                      Arriving Saturday means one night maximum — the event ends Sunday.
+                    </p>
+                  )}
                 </div>
               </div>
             )}
