@@ -3,33 +3,41 @@
 import { useState } from 'react'
 import Link from 'next/link'
 
-const TOTAL_CASTLE_BEDS = 40
-const BEDS_TAKEN = 12 // This would come from a database in production
+const TOTAL_CASTLE_BEDS = 90
+const VILLAGE_BEDS = 70
+const BEDS_TAKEN_CASTLE = 23
+const BEDS_TAKEN_VILLAGE = 12
 
-export default function TicketsPage() {
+export default function RSVPPage() {
   const [hoveredNav, setHoveredNav] = useState<string | null>(null)
-  const days = ['Friday', 'Saturday', 'Sunday']
-
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    address: '',
-    invitedBy: '',
-    arrivalDay: '',
-    departureDay: '',
-    accommodation: '',
-    nights: 1,
-  })
-
-  const isDayOnly =
-    formData.arrivalDay !== '' &&
-    formData.arrivalDay === formData.departureDay
-
-  const validDepartureDays = formData.arrivalDay
-    ? days.slice(days.indexOf(formData.arrivalDay))
-    : days
+  const [step, setStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+
+  const [formData, setFormData] = useState({
+    // Step 1: Attendance
+    attendance: '',
+    plusOne: false,
+    plusOneName: '',
+    
+    // Step 2: Arrival & Stay
+    arrivalDay: '',
+    stayDuration: '',
+    
+    // Step 3: Accommodation
+    stayingOvernight: '',
+    accommodationPreference: '',
+    
+    // Step 4: Contribution
+    contribution: 90,
+    
+    // Step 5: Contact
+    name: '',
+    email: '',
+    phone: '',
+    invitedBy: '',
+    notes: '',
+  })
 
   const navItems = [
     { label: 'HOME', href: '/' },
@@ -39,28 +47,41 @@ export default function TicketsPage() {
     { label: "FAQ'S", href: '/faqs' },
   ]
 
-  const bedsRemaining = TOTAL_CASTLE_BEDS - BEDS_TAKEN
+  const castleBedsRemaining = TOTAL_CASTLE_BEDS - BEDS_TAKEN_CASTLE
+  const villageBedsRemaining = VILLAGE_BEDS - BEDS_TAKEN_VILLAGE
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500))
     setIsSubmitting(false)
     setIsSubmitted(true)
   }
 
-  const calculateTotal = () => {
-    if (formData.accommodation === 'castle') {
-      return formData.nights * 90
+  const canProceed = () => {
+    switch (step) {
+      case 1:
+        return formData.attendance !== ''
+      case 2:
+        return formData.arrivalDay !== '' && formData.stayDuration !== ''
+      case 3:
+        return formData.stayingOvernight !== '' && 
+          (formData.stayingOvernight === 'no' || formData.accommodationPreference !== '')
+      case 4:
+        return formData.contribution >= 20
+      case 5:
+        return formData.name !== '' && formData.email !== '' && formData.invitedBy !== ''
+      default:
+        return false
     }
-    return 0
   }
 
+  const totalSteps = 5
+
+  // Success screen
   if (isSubmitted) {
     return (
       <div className="min-h-screen font-sans" style={{ background: 'linear-gradient(180deg, #7B8FA1 0%, #8E9AAF 50%, #9BA8B4 100%)' }}>
-        {/* Navigation */}
         <nav className="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto">
           <Link href="/" className="text-2xl font-bold text-white">
             THE CASTLE TAKEOVER
@@ -80,15 +101,22 @@ export default function TicketsPage() {
 
         <main className="flex flex-col items-center justify-center px-8 py-20">
           <div className="bg-[#D4726A] rounded-3xl p-12 max-w-lg text-center border-4 border-[#2D4A3E]">
-            <h2 className="text-3xl font-bold text-white mb-4">You&apos;re on the list!</h2>
+            <h2 className="text-3xl font-bold text-white mb-4">You&apos;re in!</h2>
             <p className="text-white/90 text-lg mb-6">
-              Thank you for your RSVP, {formData.name}. We can&apos;t wait to celebrate with you at Schloss Dornburg!
+              Thank you, {formData.name}! We&apos;re so excited to have you join us at Schloss Dornburg.
             </p>
-            {formData.accommodation === 'castle' && (
-              <p className="text-[#FFE135] font-semibold">
-                Castle bed reserved: {formData.nights} night(s) = €{calculateTotal()}
+            <p className="text-white/80 text-sm mb-4">
+              We&apos;ll be in touch with more details as the event approaches.
+            </p>
+            {formData.plusOne && formData.plusOneName && (
+              <p className="text-[#FFE135] font-medium mb-4">
+                + {formData.plusOneName} is coming too!
               </p>
             )}
+            <div className="bg-white/20 rounded-lg p-4 mt-6">
+              <p className="text-white/90 text-sm">Your contribution</p>
+              <p className="text-3xl font-bold text-[#FFE135]">{'\u20AC'}{formData.contribution}</p>
+            </div>
             <Link
               href="/"
               className="inline-block mt-8 bg-[#FFE135] text-[#2D4A3E] font-bold px-8 py-3 rounded-lg border-2 border-[#2D4A3E] hover:scale-105 transition-transform"
@@ -135,294 +163,441 @@ export default function TicketsPage() {
       </nav>
 
       {/* Main Content */}
-      <main className="relative z-10 px-8 py-12 max-w-4xl mx-auto">
+      <main className="relative z-10 px-8 py-12 max-w-2xl mx-auto">
         {/* Header */}
         <h1 className="text-5xl font-bold text-[#FFE135] text-center mb-4" style={{ textShadow: '2px 2px 0 #2D4A3E' }}>
-          RSVP
+          Join Us
         </h1>
-        <p className="text-white text-center text-lg mb-12 max-w-2xl mx-auto">
-          Join Cari, Peter & Georg for their 40th birthday celebration at Schloss Dornburg
+        <p className="text-white text-center text-lg mb-8 max-w-xl mx-auto">
+          This is not just a party — it&apos;s a shared weekend with friends old and new.
         </p>
 
-        {/* Bed Availability Banner */}
-        <div className="bg-white/20 backdrop-blur rounded-xl p-4 mb-8 flex items-center justify-center gap-4 border border-white/30">
-          <div className="text-white">
-            <span className="font-semibold">Castle Beds Available:</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-4xl font-bold text-[#FFE135]">{bedsRemaining}</span>
-            <span className="text-white/80 text-sm">of {TOTAL_CASTLE_BEDS}</span>
-          </div>
-          <div className="w-32 h-3 bg-white/30 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-[#FFE135] rounded-full transition-all"
-              style={{ width: `${(bedsRemaining / TOTAL_CASTLE_BEDS) * 100}%` }}
+        {/* Progress indicator */}
+        <div className="flex items-center justify-center gap-2 mb-8">
+          {[1, 2, 3, 4, 5].map((s) => (
+            <div
+              key={s}
+              className={`h-2 rounded-full transition-all ${
+                s === step ? 'w-8 bg-[#FFE135]' : s < step ? 'w-4 bg-[#FFE135]/60' : 'w-4 bg-white/30'
+              }`}
             />
-          </div>
+          ))}
         </div>
 
-        {/* RSVP Form Card */}
-        <div className="relative">
-          {/* Ticket stub shape */}
-          <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#8E9AAF] rounded-full" />
-          <div className="absolute -right-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#8E9AAF] rounded-full" />
-          
-          <form 
-            onSubmit={handleSubmit}
-            className="bg-[#D4726A] rounded-3xl p-8 border-4 border-[#2D4A3E]"
-          >
-            {/* Dashed line separator */}
-            <div className="border-t-2 border-dashed border-[#2D4A3E]/40 mb-8" />
-
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Name */}
-              <div>
-                <label className="block text-white font-semibold mb-2">Your Name *</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-white/90 text-[#2D4A3E] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE135]"
-                  placeholder="Enter your full name"
-                />
-              </div>
-
-              {/* Email */}
-              <div>
-                <label className="block text-white font-semibold mb-2">Email *</label>
-                <input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-white/90 text-[#2D4A3E] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE135]"
-                  placeholder="your@email.com"
-                />
-              </div>
-
-              {/* Address */}
-              <div className="md:col-span-2">
-                <label className="block text-white font-semibold mb-2">Address *</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-white/90 text-[#2D4A3E] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE135]"
-                  placeholder="Your full address"
-                />
-              </div>
-
-              {/* Invited By */}
-              <div>
-                <label className="block text-white font-semibold mb-2">Invited by *</label>
-                <div className="flex gap-3">
-                  {['Georg', 'Cari', 'Peter'].map((host) => (
+        {/* Form Card */}
+        <form onSubmit={handleSubmit}>
+          <div className="bg-[#D4726A] rounded-3xl p-8 border-4 border-[#2D4A3E] min-h-[400px] flex flex-col">
+            
+            {/* Step 1: Attendance */}
+            {step === 1 && (
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-white mb-2">Are you joining us?</h2>
+                <p className="text-white/80 mb-6">28 - 30 August 2026 at Schloss Dornburg</p>
+                
+                <div className="space-y-3 mb-8">
+                  {[
+                    { value: 'yes', label: 'Yes, definitely!' },
+                    { value: 'likely', label: 'Most likely' },
+                    { value: 'maybe', label: 'Not sure yet' },
+                  ].map((option) => (
                     <label
-                      key={host}
-                      className={`flex-1 text-center py-3 px-4 rounded-lg cursor-pointer transition-all font-semibold ${
-                        formData.invitedBy === host
+                      key={option.value}
+                      className={`block p-4 rounded-xl cursor-pointer transition-all ${
+                        formData.attendance === option.value
                           ? 'bg-[#FFE135] text-[#2D4A3E] border-2 border-[#2D4A3E]'
-                          : 'bg-white/30 text-white border-2 border-transparent hover:bg-white/50'
+                          : 'bg-white/20 text-white border-2 border-transparent hover:bg-white/30'
                       }`}
                     >
                       <input
                         type="radio"
-                        name="invitedBy"
-                        value={host}
-                        checked={formData.invitedBy === host}
-                        onChange={(e) => setFormData({ ...formData, invitedBy: e.target.value })}
+                        name="attendance"
+                        value={option.value}
+                        checked={formData.attendance === option.value}
+                        onChange={(e) => setFormData({ ...formData, attendance: e.target.value })}
                         className="sr-only"
-                        required
                       />
-                      {host}
+                      <span className="font-semibold">{option.label}</span>
                     </label>
                   ))}
                 </div>
-              </div>
 
-              {/* Arrival Day */}
-              <div>
-                <label className="block text-white font-semibold mb-2">Arriving on *</label>
-                <div className="flex gap-3">
-                  {days.map((day) => (
-                    <label
-                      key={day}
-                      className={`flex-1 text-center py-3 px-2 rounded-lg cursor-pointer transition-all font-semibold text-sm ${
-                        formData.arrivalDay === day
-                          ? 'bg-[#FFE135] text-[#2D4A3E] border-2 border-[#2D4A3E]'
-                          : 'bg-white/30 text-white border-2 border-transparent hover:bg-white/50'
-                      }`}
-                    >
+                {formData.attendance && (
+                  <div className="border-t border-white/20 pt-6">
+                    <label className="flex items-center gap-3 cursor-pointer">
                       <input
-                        type="radio"
-                        name="arrivalDay"
-                        value={day}
-                        checked={formData.arrivalDay === day}
-                        onChange={(e) => {
-                          const newArrival = e.target.value
-                          // reset departure if it's now before the new arrival
-                          const dIdx = days.indexOf(formData.departureDay)
-                          const aIdx = days.indexOf(newArrival)
-                          setFormData({
-                            ...formData,
-                            arrivalDay: newArrival,
-                            departureDay: dIdx >= aIdx ? formData.departureDay : '',
-                          })
-                        }}
-                        className="sr-only"
-                        required
+                        type="checkbox"
+                        checked={formData.plusOne}
+                        onChange={(e) => setFormData({ ...formData, plusOne: e.target.checked, plusOneName: '' })}
+                        className="w-5 h-5 rounded accent-[#FFE135]"
                       />
-                      {day}
+                      <span className="text-white font-medium">I&apos;m bringing a +1</span>
                     </label>
-                  ))}
-                </div>
+                    {formData.plusOne && (
+                      <input
+                        type="text"
+                        value={formData.plusOneName}
+                        onChange={(e) => setFormData({ ...formData, plusOneName: e.target.value })}
+                        placeholder="Their name"
+                        className="mt-3 w-full px-4 py-3 rounded-lg bg-white/90 text-[#2D4A3E] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE135]"
+                      />
+                    )}
+                  </div>
+                )}
               </div>
+            )}
 
-              {/* Departure Day */}
-              <div>
-                <label className="block text-white font-semibold mb-2">Departing on *</label>
-                <div className="flex gap-3">
-                  {days.map((day) => {
-                    const disabled = formData.arrivalDay
-                      ? days.indexOf(day) < days.indexOf(formData.arrivalDay)
-                      : false
-                    return (
+            {/* Step 2: Arrival & Stay */}
+            {step === 2 && (
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-white mb-2">When will you be there?</h2>
+                <p className="text-white/80 mb-6">Help us plan food, logistics, and the weekend flow</p>
+                
+                <div className="mb-6">
+                  <label className="block text-white font-semibold mb-3">When do you plan to arrive?</label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      { value: 'friday', label: 'Friday' },
+                      { value: 'saturday', label: 'Saturday' },
+                      { value: 'unsure-arrival', label: 'Not sure yet' },
+                    ].map((option) => (
                       <label
-                        key={day}
-                        className={`flex-1 text-center py-3 px-2 rounded-lg transition-all font-semibold text-sm ${
-                          disabled
-                            ? 'opacity-30 cursor-not-allowed bg-white/10 border-2 border-transparent'
-                            : formData.departureDay === day
-                            ? 'bg-[#FFE135] text-[#2D4A3E] border-2 border-[#2D4A3E] cursor-pointer'
-                            : 'bg-white/30 text-white border-2 border-transparent hover:bg-white/50 cursor-pointer'
+                        key={option.value}
+                        className={`text-center p-3 rounded-xl cursor-pointer transition-all ${
+                          formData.arrivalDay === option.value
+                            ? 'bg-[#FFE135] text-[#2D4A3E] border-2 border-[#2D4A3E]'
+                            : 'bg-white/20 text-white border-2 border-transparent hover:bg-white/30'
                         }`}
                       >
                         <input
                           type="radio"
-                          name="departureDay"
-                          value={day}
-                          checked={formData.departureDay === day}
-                          onChange={(e) => setFormData({ ...formData, departureDay: e.target.value })}
+                          name="arrivalDay"
+                          value={option.value}
+                          checked={formData.arrivalDay === option.value}
+                          onChange={(e) => setFormData({ ...formData, arrivalDay: e.target.value })}
                           className="sr-only"
-                          disabled={disabled}
-                          required
                         />
-                        {day}
+                        <span className="font-semibold text-sm">{option.label}</span>
                       </label>
-                    )
-                  })}
+                    ))}
+                  </div>
                 </div>
-                {isDayOnly && (
-                  <p className="mt-2 text-[#FFE135] text-sm font-medium">
-                    Day visit — no overnight stay needed.
-                  </p>
-                )}
-              </div>
 
-              {/* Accommodation — hidden for day-only visitors */}
-              {!isDayOnly && (
-                <>
-                  <div className="md:col-span-2">
-                    <label className="block text-white font-semibold mb-3">Accommodation *</label>
-                    <div className="grid md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-white font-semibold mb-3">How long will you stay?</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { value: 'day-only', label: 'Just for the day' },
+                      { value: 'one-night', label: 'One night' },
+                      { value: 'two-nights', label: 'Two nights' },
+                      { value: 'unsure-stay', label: 'Not sure yet' },
+                    ].map((option) => (
+                      <label
+                        key={option.value}
+                        className={`text-center p-3 rounded-xl cursor-pointer transition-all ${
+                          formData.stayDuration === option.value
+                            ? 'bg-[#FFE135] text-[#2D4A3E] border-2 border-[#2D4A3E]'
+                            : 'bg-white/20 text-white border-2 border-transparent hover:bg-white/30'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="stayDuration"
+                          value={option.value}
+                          checked={formData.stayDuration === option.value}
+                          onChange={(e) => setFormData({ ...formData, stayDuration: e.target.value })}
+                          className="sr-only"
+                        />
+                        <span className="font-semibold text-sm">{option.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Accommodation */}
+            {step === 3 && (
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-white mb-2">Where will you sleep?</h2>
+                <p className="text-white/80 mb-6">We&apos;ll coordinate based on preferences — this isn&apos;t a hard booking</p>
+                
+                <div className="mb-6">
+                  <label className="block text-white font-semibold mb-3">Do you plan to stay overnight?</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { value: 'yes', label: 'Yes' },
+                      { value: 'no', label: 'No, just visiting' },
+                    ].map((option) => (
+                      <label
+                        key={option.value}
+                        className={`text-center p-4 rounded-xl cursor-pointer transition-all ${
+                          formData.stayingOvernight === option.value
+                            ? 'bg-[#FFE135] text-[#2D4A3E] border-2 border-[#2D4A3E]'
+                            : 'bg-white/20 text-white border-2 border-transparent hover:bg-white/30'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="stayingOvernight"
+                          value={option.value}
+                          checked={formData.stayingOvernight === option.value}
+                          onChange={(e) => setFormData({ ...formData, stayingOvernight: e.target.value, accommodationPreference: '' })}
+                          className="sr-only"
+                        />
+                        <span className="font-semibold">{option.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {formData.stayingOvernight === 'yes' && (
+                  <div>
+                    <label className="block text-white font-semibold mb-3">Accommodation preference</label>
+                    <div className="space-y-3">
                       {[
-                        { value: 'castle', label: 'Castle Bed', price: '€90/night', limited: true },
-                        { value: 'tent', label: 'Bring a Tent', price: 'Free', limited: false },
-                        { value: 'camper', label: 'Camper/RV', price: 'Free', limited: false },
-                        { value: 'village', label: 'Village Nearby', price: 'Self-arrange', limited: false },
+                        { 
+                          value: 'castle', 
+                          label: 'Castle', 
+                          desc: 'Sleep in the castle itself',
+                          availability: `${castleBedsRemaining} of ${TOTAL_CASTLE_BEDS} beds available`,
+                        },
+                        { 
+                          value: 'village', 
+                          label: 'Village nearby', 
+                          desc: '5 min away, we help coordinate',
+                          availability: `${villageBedsRemaining} of ${VILLAGE_BEDS} beds available`,
+                        },
+                        { 
+                          value: 'camping', 
+                          label: 'Camping', 
+                          desc: 'Tent or camper on the grounds',
+                          availability: 'Plenty of space',
+                        },
+                        { 
+                          value: 'self', 
+                          label: 'I\'ll arrange my own', 
+                          desc: 'Hotel, Airbnb, etc.',
+                          availability: null,
+                        },
                       ].map((option) => (
                         <label
                           key={option.value}
-                          className={`flex items-center justify-between p-4 rounded-lg cursor-pointer transition-all ${
-                            formData.accommodation === option.value
+                          className={`block p-4 rounded-xl cursor-pointer transition-all ${
+                            formData.accommodationPreference === option.value
                               ? 'bg-[#FFE135] text-[#2D4A3E] border-2 border-[#2D4A3E]'
-                              : 'bg-white/30 text-white border-2 border-transparent hover:bg-white/50'
+                              : 'bg-white/20 text-white border-2 border-transparent hover:bg-white/30'
                           }`}
                         >
-                          <div className="flex items-center gap-3">
-                            <input
-                              type="radio"
-                              name="accommodation"
-                              value={option.value}
-                              checked={formData.accommodation === option.value}
-                              onChange={(e) => setFormData({ ...formData, accommodation: e.target.value })}
-                              className="sr-only"
-                              required={!isDayOnly}
-                            />
-                            <span className="font-semibold">{option.label}</span>
-                            {option.limited && (
-                              <span className="text-xs bg-[#2D4A3E] text-white px-2 py-0.5 rounded-full">
-                                {bedsRemaining} left
+                          <input
+                            type="radio"
+                            name="accommodationPreference"
+                            value={option.value}
+                            checked={formData.accommodationPreference === option.value}
+                            onChange={(e) => setFormData({ ...formData, accommodationPreference: e.target.value })}
+                            className="sr-only"
+                          />
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <span className="font-semibold block">{option.label}</span>
+                              <span className={`text-sm ${formData.accommodationPreference === option.value ? 'text-[#2D4A3E]/70' : 'text-white/70'}`}>
+                                {option.desc}
+                              </span>
+                            </div>
+                            {option.availability && (
+                              <span className={`text-xs px-2 py-1 rounded-full ${
+                                formData.accommodationPreference === option.value
+                                  ? 'bg-[#2D4A3E]/20 text-[#2D4A3E]'
+                                  : 'bg-white/20 text-white/80'
+                              }`}>
+                                {option.availability}
                               </span>
                             )}
                           </div>
-                          <span className={`font-bold ${formData.accommodation === option.value ? 'text-[#2D4A3E]' : 'text-[#FFE135]'}`}>
-                            {option.price}
-                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Step 4: Contribution */}
+            {step === 4 && (
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-white mb-2">Solidarity Contribution</h2>
+                <p className="text-white/80 mb-6">
+                  This weekend has real costs — venue, food, drinks, music, and more. 
+                  We&apos;re asking everyone to contribute what they can.
+                </p>
+
+                <div className="bg-white/10 rounded-xl p-5 mb-6">
+                  <p className="text-white/90 text-sm mb-2">
+                    <strong>How this works:</strong> Our target is around {'\u20AC'}90 per person on average. 
+                    If that&apos;s comfortable for you, great. If you can contribute more, it helps others. 
+                    If less works better for you, that&apos;s completely okay — no questions asked.
+                  </p>
+                </div>
+
+                <div className="mb-8">
+                  <div className="flex justify-between items-end mb-3">
+                    <label className="text-white font-semibold">Your contribution</label>
+                    <span className="text-4xl font-bold text-[#FFE135]">{'\u20AC'}{formData.contribution}</span>
+                  </div>
+                  
+                  <input
+                    type="range"
+                    min="20"
+                    max="200"
+                    step="10"
+                    value={formData.contribution}
+                    onChange={(e) => setFormData({ ...formData, contribution: parseInt(e.target.value) })}
+                    className="w-full h-3 rounded-full appearance-none cursor-pointer"
+                    style={{
+                      background: `linear-gradient(to right, #FFE135 0%, #FFE135 ${((formData.contribution - 20) / 180) * 100}%, rgba(255,255,255,0.3) ${((formData.contribution - 20) / 180) * 100}%, rgba(255,255,255,0.3) 100%)`,
+                    }}
+                  />
+                  
+                  <div className="flex justify-between text-white/60 text-sm mt-2">
+                    <span>{'\u20AC'}20</span>
+                    <span className="text-white/80">suggested: {'\u20AC'}90</span>
+                    <span>{'\u20AC'}200+</span>
+                  </div>
+                </div>
+
+                {formData.contribution >= 120 && (
+                  <p className="text-[#FFE135] text-sm text-center">
+                    Thank you for your generosity — this helps make the weekend accessible for everyone.
+                  </p>
+                )}
+                {formData.contribution < 60 && (
+                  <p className="text-white/80 text-sm text-center">
+                    No worries — we&apos;re glad you&apos;re joining us regardless.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Step 5: Contact */}
+            {step === 5 && (
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-white mb-2">Almost there!</h2>
+                <p className="text-white/80 mb-6">Just a few details so we can stay in touch</p>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-white font-semibold mb-2">Your name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-4 py-3 rounded-lg bg-white/90 text-[#2D4A3E] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE135]"
+                      placeholder="Your full name"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-white font-semibold mb-2">Email *</label>
+                    <input
+                      type="email"
+                      required
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full px-4 py-3 rounded-lg bg-white/90 text-[#2D4A3E] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE135]"
+                      placeholder="your@email.com"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-white font-semibold mb-2">Phone (optional)</label>
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      className="w-full px-4 py-3 rounded-lg bg-white/90 text-[#2D4A3E] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE135]"
+                      placeholder="For last-minute updates"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-white font-semibold mb-2">Who invited you? *</label>
+                    <div className="grid grid-cols-3 gap-3">
+                      {['Georg', 'Cari', 'Peter'].map((host) => (
+                        <label
+                          key={host}
+                          className={`text-center py-3 rounded-lg cursor-pointer transition-all font-semibold ${
+                            formData.invitedBy === host
+                              ? 'bg-[#FFE135] text-[#2D4A3E] border-2 border-[#2D4A3E]'
+                              : 'bg-white/20 text-white border-2 border-transparent hover:bg-white/30'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="invitedBy"
+                            value={host}
+                            checked={formData.invitedBy === host}
+                            onChange={(e) => setFormData({ ...formData, invitedBy: e.target.value })}
+                            className="sr-only"
+                          />
+                          {host}
                         </label>
                       ))}
                     </div>
                   </div>
 
-                  {/* Number of Nights (only show if castle selected) */}
-                  {formData.accommodation === 'castle' && (
-                    <div className="md:col-span-2">
-                      <label className="block text-white font-semibold mb-2">How many nights?</label>
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-3">
-                          {[1, 2, 3].map((n) => (
-                            <label
-                              key={n}
-                              className={`w-12 h-12 flex items-center justify-center rounded-lg cursor-pointer transition-all font-bold text-lg ${
-                                formData.nights === n
-                                  ? 'bg-[#FFE135] text-[#2D4A3E] border-2 border-[#2D4A3E]'
-                                  : 'bg-white/30 text-white border-2 border-transparent hover:bg-white/50'
-                              }`}
-                            >
-                              <input
-                                type="radio"
-                                name="nights"
-                                value={n}
-                                checked={formData.nights === n}
-                                onChange={() => setFormData({ ...formData, nights: n })}
-                                className="sr-only"
-                              />
-                              {n}
-                            </label>
-                          ))}
-                        </div>
-                        <div className="text-white">
-                          <span className="text-2xl font-bold text-[#FFE135]">€{formData.nights * 90}</span>
-                          <span className="text-white/80 ml-2">total</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </>
+                  <div>
+                    <label className="block text-white font-semibold mb-2">Anything else? (optional)</label>
+                    <textarea
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                      className="w-full px-4 py-3 rounded-lg bg-white/90 text-[#2D4A3E] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE135] resize-none"
+                      rows={3}
+                      placeholder="Dietary restrictions, questions, or just say hi..."
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Navigation buttons */}
+            <div className="flex justify-between items-center mt-8 pt-6 border-t border-white/20">
+              {step > 1 ? (
+                <button
+                  type="button"
+                  onClick={() => setStep(step - 1)}
+                  className="text-white font-semibold hover:text-[#FFE135] transition-colors"
+                >
+                  Back
+                </button>
+              ) : (
+                <div />
+              )}
+
+              {step < totalSteps ? (
+                <button
+                  type="button"
+                  onClick={() => setStep(step + 1)}
+                  disabled={!canProceed()}
+                  className="bg-[#FFE135] text-[#2D4A3E] font-bold px-8 py-3 rounded-lg border-2 border-[#2D4A3E] hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                >
+                  Continue
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={!canProceed() || isSubmitting}
+                  className="bg-[#FFE135] text-[#2D4A3E] font-bold px-8 py-3 rounded-lg border-2 border-[#2D4A3E] hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                >
+                  {isSubmitting ? 'Submitting...' : 'Count me in!'}
+                </button>
               )}
             </div>
+          </div>
+        </form>
 
-            {/* Dashed line separator */}
-            <div className="border-t-2 border-dashed border-[#2D4A3E]/40 my-8" />
-
-            {/* Submit Button */}
-            <div className="flex justify-center">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="bg-[#FFE135] text-[#2D4A3E] font-bold text-xl px-12 py-4 rounded-xl border-2 border-[#2D4A3E] hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-              >
-                {isSubmitting ? 'Submitting...' : 'RSVP Now'}
-              </button>
-            </div>
-          </form>
-        </div>
-
-        {/* Footer note */}
-        <p className="text-white/70 text-center text-sm mt-8">
-          Questions? Contact us at hello@thecastletakeover.de
+        {/* Step indicator text */}
+        <p className="text-white/50 text-center text-sm mt-4">
+          Step {step} of {totalSteps}
         </p>
       </main>
     </div>
