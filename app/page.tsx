@@ -24,6 +24,36 @@ export default function Home() {
         }}
       />
 
+      {/* Floating decorative elements */}
+      <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
+        {/* Large circles */}
+        <div className="absolute top-[10%] left-[5%] w-32 h-32 rounded-full bg-[#FFE135]/20 animate-bounce" style={{ animationDuration: '4s' }} />
+        <div className="absolute top-[60%] right-[8%] w-24 h-24 rounded-full bg-[#E84B8A]/20 animate-bounce" style={{ animationDuration: '5s', animationDelay: '1s' }} />
+        <div className="absolute bottom-[15%] left-[10%] w-20 h-20 rounded-full bg-[#4ECDC4]/20 animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }} />
+        
+        {/* Small sparkles / dots */}
+        <div className="absolute top-[20%] right-[15%] w-4 h-4 rounded-full bg-[#FFE135] animate-ping" style={{ animationDuration: '2s' }} />
+        <div className="absolute top-[40%] left-[15%] w-3 h-3 rounded-full bg-[#E84B8A] animate-ping" style={{ animationDuration: '2.5s', animationDelay: '0.3s' }} />
+        <div className="absolute bottom-[30%] right-[20%] w-3 h-3 rounded-full bg-[#4ECDC4] animate-ping" style={{ animationDuration: '2s', animationDelay: '0.7s' }} />
+        <div className="absolute top-[70%] left-[25%] w-2 h-2 rounded-full bg-white animate-ping" style={{ animationDuration: '1.8s', animationDelay: '1s' }} />
+        
+        {/* Stars */}
+        <svg className="absolute top-[15%] right-[25%] w-8 h-8 text-[#FFE135] animate-spin" style={{ animationDuration: '8s' }} viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7L12 16.4 5.7 21l2.3-7-6-4.6h7.6z"/>
+        </svg>
+        <svg className="absolute bottom-[25%] left-[20%] w-6 h-6 text-[#E84B8A] animate-spin" style={{ animationDuration: '10s', animationDelay: '2s' }} viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7L12 16.4 5.7 21l2.3-7-6-4.6h7.6z"/>
+        </svg>
+        <svg className="absolute top-[50%] right-[5%] w-5 h-5 text-white/60 animate-spin" style={{ animationDuration: '12s' }} viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7L12 16.4 5.7 21l2.3-7-6-4.6h7.6z"/>
+        </svg>
+        
+        {/* Wavy lines */}
+        <svg className="absolute bottom-[10%] right-[30%] w-24 h-12 text-[#FFE135]/30" viewBox="0 0 100 50">
+          <path d="M0 25 Q25 0 50 25 T100 25" stroke="currentColor" strokeWidth="3" fill="none" className="animate-pulse" />
+        </svg>
+      </div>
+
       {/* Content wrapper */}
       <div className="relative z-10 min-h-screen flex flex-col">
         {/* Navigation */}
@@ -55,7 +85,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-center max-w-5xl">
             {/* Left - Flyer Image */}
             <div className="flex-shrink-0 w-[300px] md:w-[360px]">
-              <div className="rounded-2xl overflow-hidden shadow-2xl border-4 border-[#2D4A3E]">
+              <div className="rounded-2xl overflow-hidden shadow-2xl border-4 border-[#2D4A3E] hover:scale-105 transition-transform duration-300">
                 <img
                   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/hf_20260326_204051_a3b3f6c6-2a6f-4e09-845a-7454ef0d5e34-hcN986dxg3rDEIT3LrfKUBVT36Wm5O.jpeg"
                   alt="The Castle Takeover - 40th Birthday Celebration"
@@ -64,8 +94,12 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right - Content Card (coral style like RSVP) */}
-            <div className="bg-[#D4726A] rounded-3xl border-4 border-[#2D4A3E] p-8 md:p-10 max-w-lg shadow-2xl">
+            {/* Right - Content Card */}
+            <div className="bg-[#D4726A] rounded-3xl border-4 border-[#2D4A3E] p-8 md:p-10 max-w-lg shadow-2xl relative">
+              {/* Mini decorative elements on the card */}
+              <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-[#FFE135] border-2 border-[#2D4A3E]" />
+              <div className="absolute -bottom-2 -left-2 w-6 h-6 rounded-full bg-[#4ECDC4] border-2 border-[#2D4A3E]" />
+              
               <p className="text-[#FFE135] text-lg font-medium mb-2">Three times fourty</p>
               <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
                 THE CASTLE<br />TAKEOVER
