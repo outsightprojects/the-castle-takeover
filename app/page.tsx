@@ -7,31 +7,38 @@ import Link from 'next/link'
 export default function Home() {
   const [hoveredNav, setHoveredNav] = useState<string | null>(null)
 
-  const navItems = ['HOME', 'ABOUT', 'VENUE', 'TICKETS', "FAQ'S"]
+  const navItems = [
+    { label: 'HOME', href: '/' },
+    { label: 'ABOUT', href: '/about' },
+    { label: 'VENUE', href: '/venue' },
+    { label: 'TICKETS', href: '/tickets' },
+    { label: "FAQ'S", href: '/faqs' },
+  ]
 
   return (
     <div className="min-h-screen font-sans" style={{ background: 'linear-gradient(180deg, #F5D6C6 0%, #FDEAE0 30%, #E8F4F8 70%, #7FD8BE 100%)' }}>
       {/* Navigation */}
       <nav className="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto">
-        <div className="text-2xl font-bold text-[#2D4A3E]" style={{
+        <Link href="/" className="text-2xl font-bold text-[#2D4A3E]" style={{
           letterSpacing: '0.05em',
         }}>
           THE CASTLE TAKEOVER
-        </div>
+        </Link>
         
         <div className="flex gap-8">
           {navItems.map((item) => (
-            <button
-              key={item}
-              onMouseEnter={() => setHoveredNav(item)}
+            <Link
+              key={item.label}
+              href={item.href}
+              onMouseEnter={() => setHoveredNav(item.label)}
               onMouseLeave={() => setHoveredNav(null)}
               className="text-[#2D4A3E] font-semibold text-sm transition-all duration-200 px-3 py-2 hover:text-[#E84B8A]"
               style={{
-                transform: hoveredNav === item ? 'scale(1.1)' : 'scale(1)',
+                transform: hoveredNav === item.label ? 'scale(1.1)' : 'scale(1)',
               }}
             >
-              {item}
-            </button>
+              {item.label}
+            </Link>
           ))}
         </div>
       </nav>

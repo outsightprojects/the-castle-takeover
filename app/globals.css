@@ -4,32 +4,62 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Vibrant party palette */
-  --background: #1a1a1a;
-  --foreground: #FFFFFF;
+  --background: #FDEAE0;
+  --foreground: #2D4A3E;
+  --card: #FFFFFF;
+  --card-foreground: #2D4A3E;
+  --popover: #FFFFFF;
+  --popover-foreground: #2D4A3E;
   --primary: #FF6B35;
+  --primary-foreground: #FFFFFF;
   --secondary: #4ECDC4;
+  --secondary-foreground: #FFFFFF;
+  --muted: #FFE4B5;
+  --muted-foreground: #6B4E8E;
   --accent: #FFE66D;
-  --purple: #B8368D;
-  --pink: #E84B8A;
-  --orange: #FF6B35;
+  --accent-foreground: #2D4A3E;
+  --destructive: #FF6B6B;
+  --destructive-foreground: #FFFFFF;
+  --border: #e5e5e5;
+  --input: #e5e5e5;
+  --ring: #2D4A3E;
+  --radius: 0.625rem;
 }
 
 @theme inline {
   --font-sans: var(--font-fredoka), 'Fredoka', sans-serif;
   --font-mono: 'Geist Mono', 'Geist Mono Fallback';
-  --color-border: #e5e5e5;
-  --color-ring: #2D4A3E;
-  --color-background: #FDEAE0;
-  --color-foreground: #2D4A3E;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
 @layer base {
   * {
-    border-color: #e5e5e5;
+    border-color: var(--border);
   }
   body {
-    background: #FDEAE0;
-    color: #2D4A3E;
+    background-color: var(--background);
+    color: var(--foreground);
   }
 }
