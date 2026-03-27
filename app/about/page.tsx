@@ -372,10 +372,11 @@ export default function AboutPage() {
             <section className="text-center pb-12">
               <Link
                 href="/tickets"
-                className="inline-block bg-[#FFE135] text-[#2D4A3E] font-bold text-lg px-10 py-4 rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 border-2 border-white/30"
+                className="inline-block bg-[#FFE135] text-[#2D4A3E] font-bold text-lg px-10 py-4 rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 border-2 border-[#2D4A3E]"
               >
                 Join Us — RSVP Now
               </Link>
+            </section>
         </article>
       </main>
 
