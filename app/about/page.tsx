@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { useState } from 'react'
 
-// About page - updated
 export default function AboutPage() {
   const [hoveredNav, setHoveredNav] = useState<string | null>(null)
   const [activeSection, setActiveSection] = useState('intro')
@@ -13,7 +12,6 @@ export default function AboutPage() {
     { label: 'ABOUT', href: '/about' },
     { label: 'VENUE', href: '/venue' },
     { label: 'RSVP', href: '/tickets' },
-    { label: "FAQ'S", href: '/faqs' },
   ]
 
   const sections = [
@@ -34,10 +32,10 @@ export default function AboutPage() {
   }
 
   return (
-    <div className="min-h-screen font-sans relative">
+    <div className="min-h-screen font-sans relative overflow-hidden">
       {/* Wavy background pattern */}
       <div 
-        className="fixed inset-0 z-0"
+        className="absolute inset-0 z-0"
         style={{
           backgroundColor: '#6B7B8E',
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 15.347 39.647 14 50 14c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 13.278 60.562 12 50 12c-10.626 0-16.855 1.397-26.66 5.063l-1.767.662c-2.475.923-4.66 1.674-6.724 2.275h6.335zm0-20C13.258 2.892 8.077 4 0 4V2c5.744 0 9.951-.574 14.85-2h6.334zM77.38 0C85.239 2.966 90.502 4 100 4V2c-6.842 0-11.386-.542-16.396-2h-6.225zM0 14c8.44 0 13.718-1.21 22.272-4.402l1.768-.661C33.64 5.347 39.647 4 50 4c10.271 0 15.362 1.222 24.629 4.928C84.112 12.722 89.438 14 100 14v-2c-10.271 0-15.362-1.222-24.629-4.928C65.888 3.278 60.562 2 50 2 39.374 2 33.145 3.397 23.34 7.063l-1.767.662C13.223 10.84 8.163 12 0 12v2z' fill='%23596775' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E")`,
@@ -51,7 +49,6 @@ export default function AboutPage() {
           <Link href="/" className="text-2xl font-bold text-white drop-shadow-md" style={{ letterSpacing: '0.05em' }}>
             THE CASTLE TAKEOVER
           </Link>
-
           <div className="flex gap-8">
             {navItems.map((item) => (
               <Link
@@ -74,7 +71,6 @@ export default function AboutPage() {
         <main className="flex-1 px-8 py-8 max-w-4xl mx-auto w-full">
           {/* Coral card container */}
           <div className="bg-[#D4726A] rounded-3xl border-4 border-[#2D4A3E] p-8 md:p-10">
-            {/* Title */}
             <h1 className="text-4xl font-bold text-white mb-2">About this Weekend</h1>
             <p className="text-white/80 mb-6">Everything you need to know</p>
 
@@ -95,9 +91,8 @@ export default function AboutPage() {
               ))}
             </div>
 
-            {/* Scrollable content sections */}
-            <div className="space-y-8 max-h-[60vh] overflow-y-auto pr-2 scroll-smooth">
-              {/* Intro */}
+            {/* Content sections */}
+            <div className="space-y-8 max-h-[60vh] overflow-y-auto pr-2">
               <section id="intro" className="bg-white/20 rounded-2xl p-6">
                 <p className="text-white text-lg leading-relaxed mb-4">
                   We&apos;re turning 40. Which felt like a good enough reason to do something slightly stupid.
@@ -107,7 +102,6 @@ export default function AboutPage() {
                 </p>
               </section>
 
-              {/* Why */}
               <section id="why" className="bg-white/20 rounded-2xl p-6">
                 <h2 className="text-2xl font-bold text-[#FFE135] mb-4">Why this exists</h2>
                 <p className="text-white text-lg leading-relaxed mb-4">
@@ -125,31 +119,19 @@ export default function AboutPage() {
                 </p>
               </section>
 
-              {/* Energy */}
               <section id="energy" className="bg-white/20 rounded-2xl p-6">
                 <h2 className="text-2xl font-bold text-[#FFE135] mb-4">The vibe</h2>
                 <p className="text-white text-lg mb-4">Keep it simple:</p>
                 <ul className="space-y-2 text-white text-lg">
-                  <li className="flex items-center gap-3">
-                    <span className="text-[#FFE135]">•</span> be open
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <span className="text-[#FFE135]">•</span> be kind
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <span className="text-[#FFE135]">•</span> don&apos;t be weird in a bad way
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <span className="text-[#FFE135]">•</span> respect boundaries
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <span className="text-[#FFE135]">•</span> connect if it feels right
-                  </li>
+                  <li className="flex items-center gap-3"><span className="text-[#FFE135]">•</span> be open</li>
+                  <li className="flex items-center gap-3"><span className="text-[#FFE135]">•</span> be kind</li>
+                  <li className="flex items-center gap-3"><span className="text-[#FFE135]">•</span> don&apos;t be weird in a bad way</li>
+                  <li className="flex items-center gap-3"><span className="text-[#FFE135]">•</span> respect boundaries</li>
+                  <li className="flex items-center gap-3"><span className="text-[#FFE135]">•</span> connect if it feels right</li>
                 </ul>
                 <p className="text-white/70 text-lg mt-4 italic">That&apos;s it.</p>
               </section>
 
-              {/* Contribution */}
               <section id="contribution" className="bg-white/20 rounded-2xl p-6">
                 <h2 className="text-2xl font-bold text-[#FFE135] mb-4">Making it happen</h2>
                 <p className="text-white text-lg leading-relaxed mb-4">
@@ -163,7 +145,6 @@ export default function AboutPage() {
                 </p>
               </section>
 
-              {/* Program */}
               <section id="program" className="bg-white/20 rounded-2xl p-6">
                 <h2 className="text-2xl font-bold text-[#FFE135] mb-4">What&apos;s going on</h2>
                 <p className="text-white text-lg font-medium mb-4">Saturday is the main day.</p>
@@ -177,7 +158,6 @@ export default function AboutPage() {
                 </div>
               </section>
 
-              {/* Goal */}
               <section id="goal" className="bg-white/20 rounded-2xl p-6 text-center">
                 <h2 className="text-2xl font-bold text-[#FFE135] mb-4">The point</h2>
                 <p className="text-white text-xl leading-relaxed mb-4">
@@ -187,7 +167,6 @@ export default function AboutPage() {
                 <p className="text-white text-xl font-semibold">Let&apos;s make it count.</p>
               </section>
 
-              {/* CTA */}
               <section className="text-center pt-4 pb-2">
                 <p className="text-white/80 text-lg mb-4">Come, be part of it.</p>
                 <Link
@@ -201,7 +180,6 @@ export default function AboutPage() {
           </div>
         </main>
 
-        {/* Footer */}
         <footer className="text-center text-white/60 text-sm py-6">
           <p className="font-semibold text-white/80">thecastletakeover.de</p>
         </footer>
