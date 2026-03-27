@@ -5,6 +5,7 @@ import { useState } from 'react'
 
 export default function AboutPage() {
   const [hoveredNav, setHoveredNav] = useState<string | null>(null)
+  const [activeSection, setActiveSection] = useState('intro')
 
   const navItems = [
     { label: 'HOME', href: '/' },
@@ -14,159 +15,196 @@ export default function AboutPage() {
     { label: "FAQ'S", href: '/faqs' },
   ]
 
+  const sections = [
+    { id: 'intro', label: 'Intro' },
+    { id: 'why', label: 'Why' },
+    { id: 'energy', label: 'The Vibe' },
+    { id: 'contribution', label: 'Contribution' },
+    { id: 'program', label: 'Program' },
+    { id: 'goal', label: 'The Goal' },
+  ]
+
+  const scrollToSection = (id: string) => {
+    setActiveSection(id)
+    const el = document.getElementById(id)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
   return (
-    <div
-      className="min-h-screen font-sans"
-      style={{
-        background: 'linear-gradient(180deg, #F5D6C6 0%, #FDEAE0 30%, #E8F4F8 70%, #7FD8BE 100%)',
-      }}
-    >
-      {/* Navigation */}
-      <nav className="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto">
-        <Link href="/" className="text-2xl font-bold text-[#2D4A3E]" style={{ letterSpacing: '0.05em' }}>
-          THE CASTLE TAKEOVER
-        </Link>
+    <div className="min-h-screen font-sans relative">
+      {/* Wavy background pattern */}
+      <div 
+        className="fixed inset-0 z-0"
+        style={{
+          backgroundColor: '#6B7B8E',
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 15.347 39.647 14 50 14c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 13.278 60.562 12 50 12c-10.626 0-16.855 1.397-26.66 5.063l-1.767.662c-2.475.923-4.66 1.674-6.724 2.275h6.335zm0-20C13.258 2.892 8.077 4 0 4V2c5.744 0 9.951-.574 14.85-2h6.334zM77.38 0C85.239 2.966 90.502 4 100 4V2c-6.842 0-11.386-.542-16.396-2h-6.225zM0 14c8.44 0 13.718-1.21 22.272-4.402l1.768-.661C33.64 5.347 39.647 4 50 4c10.271 0 15.362 1.222 24.629 4.928C84.112 12.722 89.438 14 100 14v-2c-10.271 0-15.362-1.222-24.629-4.928C65.888 3.278 60.562 2 50 2 39.374 2 33.145 3.397 23.34 7.063l-1.767.662C13.223 10.84 8.163 12 0 12v2z' fill='%23596775' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E")`,
+        }}
+      />
 
-        <div className="flex gap-8">
-          {navItems.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              onMouseEnter={() => setHoveredNav(item.label)}
-              onMouseLeave={() => setHoveredNav(null)}
-              className={`font-semibold text-sm transition-all duration-200 px-3 py-2 ${
-                item.label === 'ABOUT' ? 'text-[#E84B8A]' : 'text-[#2D4A3E] hover:text-[#E84B8A]'
-              }`}
-              style={{ transform: hoveredNav === item.label ? 'scale(1.1)' : 'scale(1)' }}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </div>
-      </nav>
+      {/* Content wrapper */}
+      <div className="relative z-10 min-h-screen flex flex-col">
+        {/* Navigation */}
+        <nav className="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto w-full">
+          <Link href="/" className="text-2xl font-bold text-white drop-shadow-md" style={{ letterSpacing: '0.05em' }}>
+            THE CASTLE TAKEOVER
+          </Link>
 
-      {/* Main Content */}
-      <main className="px-8 py-12 max-w-3xl mx-auto">
-        <article className="space-y-12">
-          {/* Hero */}
-          <section className="text-center">
-            <h1 className="text-5xl font-bold text-[#2D4A3E] mb-6">About this Weekend</h1>
-            <p className="text-xl text-[#4A6B5D] leading-relaxed">
-              We&apos;re turning 40.<br />
-              Which felt like a good enough reason to do something slightly stupid.
-            </p>
-            <p className="text-2xl text-[#E84B8A] font-bold mt-4">
-              So yeah — we rented a fucking castle.
-            </p>
-          </section>
+          <div className="flex gap-8">
+            {navItems.map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                onMouseEnter={() => setHoveredNav(item.label)}
+                onMouseLeave={() => setHoveredNav(null)}
+                className={`font-semibold text-sm transition-all duration-200 px-3 py-2 drop-shadow-sm ${
+                  item.label === 'ABOUT' ? 'text-[#FFE135]' : 'text-white hover:text-[#FFE135]'
+                }`}
+                style={{ transform: hoveredNav === item.label ? 'scale(1.1)' : 'scale(1)' }}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </nav>
 
-          {/* Why this exists */}
-          <section className="bg-white/70 backdrop-blur-sm rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-[#E84B8A] mb-4">Why this exists</h2>
-            <p className="text-[#2D4A3E] text-lg leading-relaxed mb-4">
-              The three of us are connected through{' '}
-              <span className="font-semibold text-[#E84B8A]">Kari</span> (the glue in all of this),
-              and somewhere along the way we realized:
-            </p>
-            <p className="text-[#4A6B5D] text-lg leading-relaxed mb-6">
-              There&apos;s a group of people around us — from different phases, places, and stories —
-              that we genuinely like.
-            </p>
-            <p className="text-[#2D4A3E] text-lg font-medium mb-2">
-              So this is about bringing all of that together.
-            </p>
-            <p className="text-[#4A6B5D] text-lg mb-4">
-              Not just a party. A full weekend of:
-            </p>
-            <p className="text-[#2D4A3E] text-lg font-medium">
-              music, dancing, talking, swimming, not sleeping, meeting new people, reconnecting, and just vibing.
-            </p>
-          </section>
+        {/* Main content */}
+        <main className="flex-1 px-8 py-8 max-w-4xl mx-auto w-full">
+          {/* Coral card container */}
+          <div className="bg-[#D4726A] rounded-3xl border-4 border-[#2D4A3E] p-8 md:p-10">
+            {/* Title */}
+            <h1 className="text-4xl font-bold text-white mb-2">About this Weekend</h1>
+            <p className="text-white/80 mb-6">Everything you need to know</p>
 
-          {/* The energy */}
-          <section className="bg-white/70 backdrop-blur-sm rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-[#E84B8A] mb-4">The energy</h2>
-            <p className="text-[#2D4A3E] text-lg mb-4">Keep it simple:</p>
-            <ul className="space-y-2 text-[#2D4A3E] text-lg">
-              <li className="flex items-center gap-3">
-                <span className="text-[#E84B8A]">•</span> be open
-              </li>
-              <li className="flex items-center gap-3">
-                <span className="text-[#E84B8A]">•</span> be kind
-              </li>
-              <li className="flex items-center gap-3">
-                <span className="text-[#E84B8A]">•</span> don&apos;t be weird in a bad way
-              </li>
-              <li className="flex items-center gap-3">
-                <span className="text-[#E84B8A]">•</span> respect boundaries
-              </li>
-              <li className="flex items-center gap-3">
-                <span className="text-[#E84B8A]">•</span> connect if it feels right
-              </li>
-            </ul>
-            <p className="text-[#4A6B5D] text-lg mt-4 italic">That&apos;s it.</p>
-          </section>
-
-          {/* Making it happen */}
-          <section className="bg-white/70 backdrop-blur-sm rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-[#E84B8A] mb-4">Making it happen</h2>
-            <p className="text-[#2D4A3E] text-lg leading-relaxed mb-4">
-              A weekend like this doesn&apos;t exist for free.
-            </p>
-            <p className="text-[#2D4A3E] text-lg font-medium mb-4">So everyone chips in.</p>
-            <p className="text-[#4A6B5D] text-lg leading-relaxed mb-4">
-              If you&apos;ve ever paid 90€ for some tiny house in Brandenburg, you&apos;ll understand:<br />
-              <span className="text-[#2D4A3E] font-medium">this is a whole weekend in a castle.</span>
-            </p>
-            <p className="text-[#2D4A3E] text-lg">
-              So it&apos;s less about paying — more about{' '}
-              <span className="text-[#E84B8A] font-semibold">making it happen together.</span>
-            </p>
-          </section>
-
-          {/* What's going on */}
-          <section className="bg-white/70 backdrop-blur-sm rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-[#E84B8A] mb-4">What&apos;s going on</h2>
-            <p className="text-[#2D4A3E] text-lg font-medium mb-4">Saturday is the main day.</p>
-            <p className="text-[#4A6B5D] text-lg leading-relaxed mb-6">
-              We&apos;ll gather, have dinner, and then it goes from there:<br />
-              <span className="text-[#2D4A3E]">music, dancing, chaos (the good kind).</span>
-            </p>
-            <div className="bg-[#E84B8A]/10 border border-[#E84B8A]/30 rounded-xl p-4">
-              <p className="text-[#2D4A3E] text-lg">
-                Also: <span className="font-bold">there&apos;s a pool</span>{' '}
-                <span className="text-[#E84B8A]">→ bring swimwear.</span>
-              </p>
+            {/* Section navigation */}
+            <div className="flex flex-wrap gap-2 mb-8 pb-6 border-b border-white/20">
+              {sections.map((section) => (
+                <button
+                  key={section.id}
+                  onClick={() => scrollToSection(section.id)}
+                  className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                    activeSection === section.id
+                      ? 'bg-[#FFE135] text-[#2D4A3E]'
+                      : 'bg-white/20 text-white hover:bg-white/30'
+                  }`}
+                >
+                  {section.label}
+                </button>
+              ))}
             </div>
-          </section>
 
-          {/* The point */}
-          <section className="text-center py-8">
-            <h2 className="text-2xl font-bold text-[#E84B8A] mb-6">The point</h2>
-            <p className="text-[#2D4A3E] text-xl leading-relaxed mb-4">
-              People from all over our lives, in one place, for one weekend.
-            </p>
-            <p className="text-[#4A6B5D] text-lg mb-4">That&apos;s rare.</p>
-            <p className="text-[#2D4A3E] text-xl font-semibold">Let&apos;s make it count.</p>
-          </section>
+            {/* Scrollable content sections */}
+            <div className="space-y-8 max-h-[60vh] overflow-y-auto pr-2 scroll-smooth">
+              {/* Intro */}
+              <section id="intro" className="bg-white/20 rounded-2xl p-6">
+                <p className="text-white text-lg leading-relaxed mb-4">
+                  We&apos;re turning 40. Which felt like a good enough reason to do something slightly stupid.
+                </p>
+                <p className="text-[#FFE135] text-2xl font-bold">
+                  So yeah — we rented a fucking castle.
+                </p>
+              </section>
 
-          {/* CTA */}
-          <section className="text-center pb-8">
-            <p className="text-[#4A6B5D] text-lg mb-6">Come, be part of it.</p>
-            <Link
-              href="/tickets"
-              className="inline-block bg-[#FFE135] text-[#2D4A3E] font-bold text-lg px-10 py-4 rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 border-2 border-[#2D4A3E]"
-            >
-              RSVP Now
-            </Link>
-          </section>
-        </article>
-      </main>
+              {/* Why */}
+              <section id="why" className="bg-white/20 rounded-2xl p-6">
+                <h2 className="text-2xl font-bold text-[#FFE135] mb-4">Why this exists</h2>
+                <p className="text-white text-lg leading-relaxed mb-4">
+                  The three of us are connected through <span className="font-semibold text-[#FFE135]">Kari</span> (the glue in all of this), and somewhere along the way we realized:
+                </p>
+                <p className="text-white/80 text-lg leading-relaxed mb-4">
+                  There&apos;s a group of people around us — from different phases, places, and stories — that we genuinely like.
+                </p>
+                <p className="text-white text-lg font-medium mb-2">
+                  So this is about bringing all of that together.
+                </p>
+                <p className="text-white/80 text-lg mb-2">Not just a party. A full weekend of:</p>
+                <p className="text-white text-lg">
+                  music, dancing, talking, swimming, not sleeping, meeting new people, reconnecting, and just vibing.
+                </p>
+              </section>
 
-      {/* Footer */}
-      <footer className="text-center text-[#4A6B5D] text-sm py-8">
-        <p className="font-semibold text-[#2D4A3E]">thecastletakeover.de</p>
-      </footer>
+              {/* Energy */}
+              <section id="energy" className="bg-white/20 rounded-2xl p-6">
+                <h2 className="text-2xl font-bold text-[#FFE135] mb-4">The vibe</h2>
+                <p className="text-white text-lg mb-4">Keep it simple:</p>
+                <ul className="space-y-2 text-white text-lg">
+                  <li className="flex items-center gap-3">
+                    <span className="text-[#FFE135]">•</span> be open
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <span className="text-[#FFE135]">•</span> be kind
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <span className="text-[#FFE135]">•</span> don&apos;t be weird in a bad way
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <span className="text-[#FFE135]">•</span> respect boundaries
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <span className="text-[#FFE135]">•</span> connect if it feels right
+                  </li>
+                </ul>
+                <p className="text-white/70 text-lg mt-4 italic">That&apos;s it.</p>
+              </section>
+
+              {/* Contribution */}
+              <section id="contribution" className="bg-white/20 rounded-2xl p-6">
+                <h2 className="text-2xl font-bold text-[#FFE135] mb-4">Making it happen</h2>
+                <p className="text-white text-lg leading-relaxed mb-4">
+                  A weekend like this doesn&apos;t exist for free. <span className="font-semibold">So everyone chips in.</span>
+                </p>
+                <p className="text-white/80 text-lg leading-relaxed mb-4">
+                  If you&apos;ve ever paid 90 Euro for some tiny house in Brandenburg, you&apos;ll understand: <span className="text-white font-medium">this is a whole weekend in a castle.</span>
+                </p>
+                <p className="text-white text-lg">
+                  So it&apos;s less about paying — more about <span className="text-[#FFE135] font-semibold">making it happen together.</span>
+                </p>
+              </section>
+
+              {/* Program */}
+              <section id="program" className="bg-white/20 rounded-2xl p-6">
+                <h2 className="text-2xl font-bold text-[#FFE135] mb-4">What&apos;s going on</h2>
+                <p className="text-white text-lg font-medium mb-4">Saturday is the main day.</p>
+                <p className="text-white/80 text-lg leading-relaxed mb-4">
+                  We&apos;ll gather, have dinner, and then it goes from there: <span className="text-white">music, dancing, chaos (the good kind).</span>
+                </p>
+                <div className="bg-[#FFE135]/20 border border-[#FFE135]/40 rounded-xl p-4">
+                  <p className="text-white text-lg">
+                    Also: <span className="font-bold">there&apos;s a pool</span> <span className="text-[#FFE135]">→ bring swimwear.</span>
+                  </p>
+                </div>
+              </section>
+
+              {/* Goal */}
+              <section id="goal" className="bg-white/20 rounded-2xl p-6 text-center">
+                <h2 className="text-2xl font-bold text-[#FFE135] mb-4">The point</h2>
+                <p className="text-white text-xl leading-relaxed mb-4">
+                  People from all over our lives, in one place, for one weekend.
+                </p>
+                <p className="text-white/70 text-lg mb-4">That&apos;s rare.</p>
+                <p className="text-white text-xl font-semibold">Let&apos;s make it count.</p>
+              </section>
+
+              {/* CTA */}
+              <section className="text-center pt-4 pb-2">
+                <p className="text-white/80 text-lg mb-4">Come, be part of it.</p>
+                <Link
+                  href="/tickets"
+                  className="inline-block bg-[#FFE135] text-[#2D4A3E] font-bold text-lg px-10 py-4 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200"
+                >
+                  RSVP Now
+                </Link>
+              </section>
+            </div>
+          </div>
+        </main>
+
+        {/* Footer */}
+        <footer className="text-center text-white/60 text-sm py-6">
+          <p className="font-semibold text-white/80">thecastletakeover.de</p>
+        </footer>
+      </div>
     </div>
   )
 }
