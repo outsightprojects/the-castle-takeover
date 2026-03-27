@@ -13,7 +13,7 @@ const navItems = [
 const galleryImages = [
   {
     src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DSC03822_VSCO-vsSBtcFYAVCSxfu5puHaMMWQafFGwn.jpeg',
-    alt: 'Schloss Dornburg front facade, cobblestone path and blue sky',
+    alt: 'Schloss Dornburg front facade',
   },
   {
     src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_4616-wvde8nVBfmqH5dsOG8TjlTlQs5XWBC.jpeg',
@@ -21,43 +21,43 @@ const galleryImages = [
   },
   {
     src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_6363-tCai6Eh7g82lDmAokMkZNuSw2vWyeM.jpeg',
-    alt: 'Outdoor dining table set with glasses in front of Schloss Dornburg',
+    alt: 'Outdoor dining table set in front of Schloss Dornburg',
   },
   {
     src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/PHOTO-2025-08-31-13-45-14-lv1MmWGqlTSWsz6B265K45rdcl6jTT.jpg',
-    alt: 'Castle entrance at night with dramatic red and blue party lighting',
+    alt: 'Castle entrance at night with party lighting',
   },
   {
     src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_4643-zaKmtTX3veSUwSVO2k0KrXWeocCujs.jpeg',
-    alt: 'Grand chandelier beneath ornate baroque painted ceiling',
+    alt: 'Grand chandelier beneath baroque painted ceiling',
   },
   {
     src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/SchlossDornburg-1-2wawD7dw6P6og2O9T190yHHfcgmTFu.png',
-    alt: 'Party dancers in hazy golden light inside Schloss Dornburg',
+    alt: 'Party dancers in golden light inside Schloss Dornburg',
   },
   {
     src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DSC03780_VSCO-2-utqXwSJOGKj8gWtNA48GUNCQ0Fu7dB.jpeg',
-    alt: 'Ornate iron staircase railing with afternoon light on wooden floors',
+    alt: 'Ornate iron staircase railing with afternoon light',
   },
   {
     src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_5255-zloq7JyG72aMeeAiMuPynAMRUm3nhm.jpeg',
-    alt: 'Yellow velvet sofa against distressed blue-painted walls',
+    alt: 'Yellow velvet sofa against distressed blue walls',
   },
   {
     src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_5251-t8PB1EK1GFMwIhFKNFKwq9f9hyzlhv.jpeg',
-    alt: 'Open castle window looking out to autumn birch trees',
+    alt: 'Open castle window looking out to birch trees',
   },
   {
     src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/E97E0F2D-7A6A-4C74-A713-A9D6379FE261-K9GdWg3hA5seapXfYPl6nboP4rDaUH.jpeg',
-    alt: 'Bedroom with purple throw on white bed and distressed blue walls',
+    alt: 'Bedroom with purple throw and distressed blue walls',
   },
   {
     src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DSC03786_VSCO-qCONnEif6g8Qs3dwrRf2zNdlC3pUKa.jpeg',
-    alt: 'Interior staircase through doorway with ornate iron scrollwork',
+    alt: 'Interior staircase with ornate iron scrollwork',
   },
   {
     src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/SchlossDornburg-iLNfrZnNsVTxPTcJ5ziL3B7ee1a8dm.png',
-    alt: 'Dramatic light rays through tall windows during a Schloss Dornburg event',
+    alt: 'Dramatic light rays through windows during an event',
   },
 ]
 
@@ -101,14 +101,29 @@ export default function VenuePage() {
         </nav>
 
         {/* Main Content */}
-        <main className="flex-1 flex flex-col items-center px-8 py-8">
-          {/* Venue Details Card */}
-          <div className="bg-[#D4726A] rounded-3xl p-8 md:p-10 max-w-5xl w-full border-4 border-[#2D4A3E] shadow-2xl mb-8">
-            <h1 className="text-4xl font-bold text-white mb-8">The Venue</h1>
+        <main className="flex-1 flex flex-col items-center px-8 py-8 gap-8">
+          {/* Video Card - at the top */}
+          <div className="bg-[#D4726A] rounded-3xl p-6 md:p-8 max-w-5xl w-full border-4 border-[#2D4A3E] shadow-2xl">
+            <h1 className="text-3xl font-bold text-white mb-4">Schloss Dornburg</h1>
+            <div className="rounded-2xl overflow-hidden border-2 border-[#2D4A3E]">
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-auto"
+                src="/videos/background.mp4"
+              />
+            </div>
+          </div>
 
-            <div className="flex flex-col md:flex-row gap-8 items-start mb-8">
+          {/* Venue Details Card */}
+          <div className="bg-[#D4726A] rounded-3xl p-6 md:p-8 max-w-5xl w-full border-4 border-[#2D4A3E] shadow-2xl">
+            <h2 className="text-2xl font-bold text-white mb-6">Location & Details</h2>
+
+            <div className="flex flex-col md:flex-row gap-6 items-start">
               {/* Map */}
-              <div className="flex-shrink-0 w-full md:w-[340px] h-[220px] rounded-xl overflow-hidden border-2 border-[#2D4A3E]">
+              <div className="flex-shrink-0 w-full md:w-[320px] h-[200px] rounded-xl overflow-hidden border-2 border-[#2D4A3E]">
                 <iframe
                   title="Schloss Dornburg map"
                   src="https://maps.google.com/maps?q=Schloss+Dornburg,+Dornburg,+Germany&z=13&output=embed"
@@ -122,19 +137,19 @@ export default function VenuePage() {
 
               {/* Info */}
               <div className="flex-1 flex flex-col gap-4">
-                <div>
-                  <h2 className="text-3xl font-bold text-white leading-tight">
-                    SCHLOSS DORNBURG
-                  </h2>
-                  <p className="text-white/80 text-base mt-3 leading-relaxed">
-                    Dornburg 1, 39264 Dornburg, Germany<br />
+                <div className="bg-white/20 rounded-xl p-4">
+                  <h3 className="text-xl font-bold text-white mb-2">SCHLOSS DORNBURG</h3>
+                  <p className="text-white/90 leading-relaxed">
+                    Dornburg 1, 39264 Dornburg, Germany
+                  </p>
+                  <p className="text-white/70 text-sm mt-2">
                     2 hours from Berlin · directly on a quiet lake · near the Elbe
                   </p>
                 </div>
 
-                <div className="bg-white/20 rounded-xl px-5 py-3 inline-block w-fit">
+                <div className="bg-white/20 rounded-xl p-4">
                   <span className="text-white font-semibold text-lg">
-                    28 – 30 August 2026
+                    28 - 30 August 2026
                   </span>
                 </div>
 
@@ -142,7 +157,7 @@ export default function VenuePage() {
                   href="https://schloss-dornburg.de"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#FFE135] font-semibold text-sm hover:underline w-fit"
+                  className="text-[#FFE135] font-semibold hover:underline"
                 >
                   schloss-dornburg.de
                 </a>
@@ -151,8 +166,8 @@ export default function VenuePage() {
           </div>
 
           {/* Gallery Card */}
-          <div className="bg-[#D4726A] rounded-3xl p-8 md:p-10 max-w-5xl w-full border-4 border-[#2D4A3E] shadow-2xl">
-            <h2 className="text-3xl font-bold text-white mb-6">Gallery</h2>
+          <div className="bg-[#D4726A] rounded-3xl p-6 md:p-8 max-w-5xl w-full border-4 border-[#2D4A3E] shadow-2xl">
+            <h2 className="text-2xl font-bold text-white mb-6">Gallery</h2>
 
             <div className="columns-2 md:columns-3 gap-3 space-y-3">
               {galleryImages.map((img) => (
@@ -169,7 +184,6 @@ export default function VenuePage() {
               ))}
             </div>
 
-            {/* Visit gallery link */}
             <div className="mt-8 text-center">
               <a
                 href="https://schloss-dornburg.de/galerie"
