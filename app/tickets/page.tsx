@@ -17,8 +17,6 @@ export default function RSVPPage() {
   const [formData, setFormData] = useState({
     // Step 1: Attendance
     attendance: '',
-    plusOne: false,
-    plusOneName: '',
     
     // Step 2: Arrival & Stay
     arrivalDay: '',
@@ -37,6 +35,7 @@ export default function RSVPPage() {
     phone: '',
     invitedBy: '',
     notes: '',
+    willingToHelp: false,
   })
 
   const navItems = [
@@ -99,24 +98,56 @@ export default function RSVPPage() {
           </div>
         </nav>
 
-        <main className="flex flex-col items-center justify-center px-8 py-20">
-          <div className="bg-[#D4726A] rounded-3xl p-12 max-w-lg text-center border-4 border-[#2D4A3E]">
+        <main className="flex flex-col items-center justify-center px-8 py-12">
+          <div className="bg-[#D4726A] rounded-3xl p-8 md:p-12 max-w-xl text-center border-4 border-[#2D4A3E]">
             <h2 className="text-3xl font-bold text-white mb-4">You&apos;re in!</h2>
             <p className="text-white/90 text-lg mb-6">
               Thank you, {formData.name}! We&apos;re so excited to have you join us at Schloss Dornburg.
             </p>
-            <p className="text-white/80 text-sm mb-4">
-              We&apos;ll be in touch with more details as the event approaches.
-            </p>
-            {formData.plusOne && formData.plusOneName && (
+            
+            {formData.willingToHelp && (
               <p className="text-[#FFE135] font-medium mb-4">
-                + {formData.plusOneName} is coming too!
+                Thanks for offering to help — we&apos;ll reach out closer to the event!
               </p>
             )}
-            <div className="bg-white/20 rounded-lg p-4 mt-6">
-              <p className="text-white/90 text-sm">Your contribution</p>
-              <p className="text-3xl font-bold text-[#FFE135]">{'\u20AC'}{formData.contribution}</p>
+
+            {/* Contribution & Payment Section */}
+            <div className="bg-white/20 rounded-xl p-6 mt-6">
+              <p className="text-white/90 text-sm mb-1">Your solidarity contribution</p>
+              <p className="text-4xl font-bold text-[#FFE135] mb-4">{'\u20AC'}{formData.contribution}</p>
+              
+              <div className="border-t border-white/20 pt-4 mt-4">
+                <p className="text-white font-semibold mb-3">Send your contribution via PayPal</p>
+                
+                {/* PayPal QR Code placeholder - replace with actual QR image */}
+                <div className="bg-white rounded-lg p-4 inline-block mb-4">
+                  <img 
+                    src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://paypal.me/castletakeover" 
+                    alt="PayPal QR Code"
+                    className="w-36 h-36"
+                  />
+                </div>
+                
+                <p className="text-white/80 text-sm mb-2">
+                  Or send directly to: <span className="text-[#FFE135] font-semibold">paypal.me/castletakeover</span>
+                </p>
+                
+                <p className="text-white/70 text-xs mt-4 px-4">
+                  Please include your name in the payment note. The earlier you pay, the more likely you&apos;ll secure your preferred bed in the castle!
+                </p>
+              </div>
             </div>
+
+            <p className="text-white/80 text-sm mt-6">
+              We&apos;ll be in touch with more details as the event approaches.
+            </p>
+
+            {/* Share link */}
+            <div className="bg-white/10 rounded-lg p-4 mt-6">
+              <p className="text-white/80 text-sm mb-2">Want to invite a friend?</p>
+              <p className="text-[#FFE135] font-medium text-sm">Share thecastletakeover.de with them</p>
+            </div>
+
             <Link
               href="/"
               className="inline-block mt-8 bg-[#FFE135] text-[#2D4A3E] font-bold px-8 py-3 rounded-lg border-2 border-[#2D4A3E] hover:scale-105 transition-transform"
@@ -223,24 +254,9 @@ export default function RSVPPage() {
 
                 {formData.attendance && (
                   <div className="border-t border-white/20 pt-6">
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.plusOne}
-                        onChange={(e) => setFormData({ ...formData, plusOne: e.target.checked, plusOneName: '' })}
-                        className="w-5 h-5 rounded accent-[#FFE135]"
-                      />
-                      <span className="text-white font-medium">I&apos;m bringing a +1</span>
-                    </label>
-                    {formData.plusOne && (
-                      <input
-                        type="text"
-                        value={formData.plusOneName}
-                        onChange={(e) => setFormData({ ...formData, plusOneName: e.target.value })}
-                        placeholder="Their name"
-                        className="mt-3 w-full px-4 py-3 rounded-lg bg-white/90 text-[#2D4A3E] font-medium focus:outline-none focus:ring-2 focus:ring-[#FFE135]"
-                      />
-                    )}
+                    <p className="text-white/80 text-sm">
+                      Want to bring a friend? Share the invitation link with them — everyone needs to sign up individually so we can plan properly.
+                    </p>
                   </div>
                 )}
               </div>
@@ -574,6 +590,23 @@ export default function RSVPPage() {
                       rows={3}
                       placeholder="Dietary restrictions, questions, or just say hi..."
                     />
+                  </div>
+
+                  <div className="border-t border-white/20 pt-4 mt-2">
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.willingToHelp}
+                        onChange={(e) => setFormData({ ...formData, willingToHelp: e.target.checked })}
+                        className="w-5 h-5 rounded accent-[#FFE135] mt-0.5"
+                      />
+                      <div>
+                        <span className="text-white font-semibold block">I&apos;m happy to lend a hand</span>
+                        <span className="text-white/70 text-sm">
+                          Bar shift, helping in the kitchen, setting up — whatever is needed to make this weekend happen together.
+                        </span>
+                      </div>
+                    </label>
                   </div>
                 </div>
               </div>
