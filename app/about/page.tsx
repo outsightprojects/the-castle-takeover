@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 
+// About page - updated
 export default function AboutPage() {
   const [hoveredNav, setHoveredNav] = useState<string | null>(null)
   const [activeSection, setActiveSection] = useState('intro')

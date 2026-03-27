@@ -56,9 +56,9 @@ export default function Home() {
 
         {/* Hero Section */}
         <main className="flex flex-1 items-center justify-center px-8 py-8">
-          <div className="flex gap-12 items-center max-w-6xl">
+          <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-center max-w-6xl">
             {/* Left - Flyer Image */}
-            <div className="flex-shrink-0 w-[380px] hidden lg:block">
+            <div className="flex-shrink-0 w-[320px] md:w-[380px]">
               <div className="rounded-2xl overflow-hidden shadow-2xl border-4 border-[#2D4A3E]">
                 <img
                   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/hf_20260326_204051_a3b3f6c6-2a6f-4e09-845a-7454ef0d5e34-hcN986dxg3rDEIT3LrfKUBVT36Wm5O.jpeg"
