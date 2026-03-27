@@ -49,6 +49,15 @@ export default function RSVPPage() {
   const castleBedsRemaining = TOTAL_CASTLE_BEDS - BEDS_TAKEN_CASTLE
   const villageBedsRemaining = VILLAGE_BEDS - BEDS_TAKEN_VILLAGE
 
+  // Day-only visitors skip the accommodation step entirely
+  const isDayOnly = formData.stayDuration === 'day-only'
+
+  // Build the actual step sequence based on context
+  const stepSequence = isDayOnly ? [1, 2, 4, 5] : [1, 2, 3, 4, 5]
+  const totalSteps = stepSequence.length
+  const currentStepIndex = stepSequence.indexOf(step)
+  const displayStep = currentStepIndex + 1
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
@@ -64,8 +73,7 @@ export default function RSVPPage() {
       case 2:
         return formData.arrivalDay !== '' && formData.stayDuration !== ''
       case 3:
-        return formData.stayingOvernight !== '' && 
-          (formData.stayingOvernight === 'no' || formData.accommodationPreference !== '')
+        return formData.accommodationPreference !== ''
       case 4:
         return formData.contribution >= 20
       case 5:
@@ -75,7 +83,19 @@ export default function RSVPPage() {
     }
   }
 
-  const totalSteps = 5
+  const goNext = () => {
+    const nextIndex = currentStepIndex + 1
+    if (nextIndex < stepSequence.length) {
+      setStep(stepSequence[nextIndex])
+    }
+  }
+
+  const goBack = () => {
+    const prevIndex = currentStepIndex - 1
+    if (prevIndex >= 0) {
+      setStep(stepSequence[prevIndex])
+    }
+  }
 
   // Success screen
   if (isSubmitted) {
@@ -205,11 +225,11 @@ export default function RSVPPage() {
 
         {/* Progress indicator */}
         <div className="flex items-center justify-center gap-2 mb-8">
-          {[1, 2, 3, 4, 5].map((s) => (
+          {stepSequence.map((s, i) => (
             <div
               key={s}
               className={`h-2 rounded-full transition-all ${
-                s === step ? 'w-8 bg-[#FFE135]' : s < step ? 'w-4 bg-[#FFE135]/60' : 'w-4 bg-white/30'
+                i === currentStepIndex ? 'w-8 bg-[#FFE135]' : i < currentStepIndex ? 'w-4 bg-[#FFE135]/60' : 'w-4 bg-white/30'
               }`}
             />
           ))}
@@ -351,43 +371,13 @@ export default function RSVPPage() {
               </div>
             )}
 
-            {/* Step 3: Accommodation */}
+            {/* Step 3: Accommodation (skipped for day-only visitors) */}
             {step === 3 && (
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-white mb-2">Where will you sleep?</h2>
                 <p className="text-white/80 mb-6">We&apos;ll coordinate based on preferences — this isn&apos;t a hard booking</p>
-                
-                <div className="mb-6">
-                  <label className="block text-white font-semibold mb-3">Do you plan to stay overnight?</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {[
-                      { value: 'yes', label: 'Yes' },
-                      { value: 'no', label: 'No, just visiting' },
-                    ].map((option) => (
-                      <label
-                        key={option.value}
-                        className={`text-center p-4 rounded-xl cursor-pointer transition-all ${
-                          formData.stayingOvernight === option.value
-                            ? 'bg-[#FFE135] text-[#2D4A3E] border-2 border-[#2D4A3E]'
-                            : 'bg-white/20 text-white border-2 border-transparent hover:bg-white/30'
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="stayingOvernight"
-                          value={option.value}
-                          checked={formData.stayingOvernight === option.value}
-                          onChange={(e) => setFormData({ ...formData, stayingOvernight: e.target.value, accommodationPreference: '' })}
-                          className="sr-only"
-                        />
-                        <span className="font-semibold">{option.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
 
-                {formData.stayingOvernight === 'yes' && (
-                  <div>
+                <div>
                     <label className="block text-white font-semibold mb-3">Accommodation preference</label>
                     <div className="space-y-3">
                       {[
@@ -453,7 +443,6 @@ export default function RSVPPage() {
                       ))}
                     </div>
                   </div>
-                )}
               </div>
             )}
 
@@ -614,10 +603,10 @@ export default function RSVPPage() {
 
             {/* Navigation buttons */}
             <div className="flex justify-between items-center mt-8 pt-6 border-t border-white/20">
-              {step > 1 ? (
+              {currentStepIndex > 0 ? (
                 <button
                   type="button"
-                  onClick={() => setStep(step - 1)}
+                  onClick={goBack}
                   className="text-white font-semibold hover:text-[#FFE135] transition-colors"
                 >
                   Back
@@ -626,10 +615,10 @@ export default function RSVPPage() {
                 <div />
               )}
 
-              {step < totalSteps ? (
+              {currentStepIndex < totalSteps - 1 ? (
                 <button
                   type="button"
-                  onClick={() => setStep(step + 1)}
+                  onClick={goNext}
                   disabled={!canProceed()}
                   className="bg-[#FFE135] text-[#2D4A3E] font-bold px-8 py-3 rounded-lg border-2 border-[#2D4A3E] hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
@@ -650,7 +639,7 @@ export default function RSVPPage() {
 
         {/* Step indicator text */}
         <p className="text-white/50 text-center text-sm mt-4">
-          Step {step} of {totalSteps}
+          Step {displayStep} of {totalSteps}
         </p>
       </main>
     </div>
