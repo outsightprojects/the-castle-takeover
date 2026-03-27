@@ -8,15 +8,26 @@ const BEDS_TAKEN = 12 // This would come from a database in production
 
 export default function TicketsPage() {
   const [hoveredNav, setHoveredNav] = useState<string | null>(null)
+  const days = ['Friday', 'Saturday', 'Sunday']
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     address: '',
     invitedBy: '',
     arrivalDay: '',
+    departureDay: '',
     accommodation: '',
     nights: 1,
   })
+
+  const isDayOnly =
+    formData.arrivalDay !== '' &&
+    formData.arrivalDay === formData.departureDay
+
+  const validDepartureDays = formData.arrivalDay
+    ? days.slice(days.indexOf(formData.arrivalDay))
+    : days
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
 
@@ -235,7 +246,7 @@ export default function TicketsPage() {
               <div>
                 <label className="block text-white font-semibold mb-2">Arriving on *</label>
                 <div className="flex gap-3">
-                  {['Friday', 'Saturday', 'Sunday'].map((day) => (
+                  {days.map((day) => (
                     <label
                       key={day}
                       className={`flex-1 text-center py-3 px-2 rounded-lg cursor-pointer transition-all font-semibold text-sm ${
@@ -249,7 +260,17 @@ export default function TicketsPage() {
                         name="arrivalDay"
                         value={day}
                         checked={formData.arrivalDay === day}
-                        onChange={(e) => setFormData({ ...formData, arrivalDay: e.target.value })}
+                        onChange={(e) => {
+                          const newArrival = e.target.value
+                          // reset departure if it's now before the new arrival
+                          const dIdx = days.indexOf(formData.departureDay)
+                          const aIdx = days.indexOf(newArrival)
+                          setFormData({
+                            ...formData,
+                            arrivalDay: newArrival,
+                            departureDay: dIdx >= aIdx ? formData.departureDay : '',
+                          })
+                        }}
                         className="sr-only"
                         required
                       />
@@ -259,82 +280,127 @@ export default function TicketsPage() {
                 </div>
               </div>
 
-              {/* Accommodation */}
-              <div className="md:col-span-2">
-                <label className="block text-white font-semibold mb-3">Accommodation *</label>
-                <div className="grid md:grid-cols-2 gap-3">
-                  {[
-                    { value: 'castle', label: 'Castle Bed', price: '€90/night', limited: true },
-                    { value: 'tent', label: 'Bring a Tent', price: 'Free', limited: false },
-                    { value: 'camper', label: 'Camper/RV', price: 'Free', limited: false },
-                    { value: 'village', label: 'Village Nearby', price: 'Self-arrange', limited: false },
-                  ].map((option) => (
-                    <label
-                      key={option.value}
-                      className={`flex items-center justify-between p-4 rounded-lg cursor-pointer transition-all ${
-                        formData.accommodation === option.value
-                          ? 'bg-[#FFE135] text-[#2D4A3E] border-2 border-[#2D4A3E]'
-                          : 'bg-white/30 text-white border-2 border-transparent hover:bg-white/50'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
+              {/* Departure Day */}
+              <div>
+                <label className="block text-white font-semibold mb-2">Departing on *</label>
+                <div className="flex gap-3">
+                  {days.map((day) => {
+                    const disabled = formData.arrivalDay
+                      ? days.indexOf(day) < days.indexOf(formData.arrivalDay)
+                      : false
+                    return (
+                      <label
+                        key={day}
+                        className={`flex-1 text-center py-3 px-2 rounded-lg transition-all font-semibold text-sm ${
+                          disabled
+                            ? 'opacity-30 cursor-not-allowed bg-white/10 border-2 border-transparent'
+                            : formData.departureDay === day
+                            ? 'bg-[#FFE135] text-[#2D4A3E] border-2 border-[#2D4A3E] cursor-pointer'
+                            : 'bg-white/30 text-white border-2 border-transparent hover:bg-white/50 cursor-pointer'
+                        }`}
+                      >
                         <input
                           type="radio"
-                          name="accommodation"
-                          value={option.value}
-                          checked={formData.accommodation === option.value}
-                          onChange={(e) => setFormData({ ...formData, accommodation: e.target.value })}
+                          name="departureDay"
+                          value={day}
+                          checked={formData.departureDay === day}
+                          onChange={(e) => setFormData({ ...formData, departureDay: e.target.value })}
                           className="sr-only"
+                          disabled={disabled}
                           required
                         />
-                        <span className="font-semibold">{option.label}</span>
-                        {option.limited && (
-                          <span className="text-xs bg-[#2D4A3E] text-white px-2 py-0.5 rounded-full">
-                            {bedsRemaining} left
-                          </span>
-                        )}
-                      </div>
-                      <span className={`font-bold ${formData.accommodation === option.value ? 'text-[#2D4A3E]' : 'text-[#FFE135]'}`}>
-                        {option.price}
-                      </span>
-                    </label>
-                  ))}
+                        {day}
+                      </label>
+                    )
+                  })}
                 </div>
+                {isDayOnly && (
+                  <p className="mt-2 text-[#FFE135] text-sm font-medium">
+                    Day visit — no overnight stay needed.
+                  </p>
+                )}
               </div>
 
-              {/* Number of Nights (only show if castle selected) */}
-              {formData.accommodation === 'castle' && (
-                <div className="md:col-span-2">
-                  <label className="block text-white font-semibold mb-2">How many nights?</label>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-3">
-                      {[1, 2, 3].map((n) => (
+              {/* Accommodation — hidden for day-only visitors */}
+              {!isDayOnly && (
+                <>
+                  <div className="md:col-span-2">
+                    <label className="block text-white font-semibold mb-3">Accommodation *</label>
+                    <div className="grid md:grid-cols-2 gap-3">
+                      {[
+                        { value: 'castle', label: 'Castle Bed', price: '€90/night', limited: true },
+                        { value: 'tent', label: 'Bring a Tent', price: 'Free', limited: false },
+                        { value: 'camper', label: 'Camper/RV', price: 'Free', limited: false },
+                        { value: 'village', label: 'Village Nearby', price: 'Self-arrange', limited: false },
+                      ].map((option) => (
                         <label
-                          key={n}
-                          className={`w-12 h-12 flex items-center justify-center rounded-lg cursor-pointer transition-all font-bold text-lg ${
-                            formData.nights === n
+                          key={option.value}
+                          className={`flex items-center justify-between p-4 rounded-lg cursor-pointer transition-all ${
+                            formData.accommodation === option.value
                               ? 'bg-[#FFE135] text-[#2D4A3E] border-2 border-[#2D4A3E]'
                               : 'bg-white/30 text-white border-2 border-transparent hover:bg-white/50'
                           }`}
                         >
-                          <input
-                            type="radio"
-                            name="nights"
-                            value={n}
-                            checked={formData.nights === n}
-                            onChange={() => setFormData({ ...formData, nights: n })}
-                            className="sr-only"
-                          />
-                          {n}
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="radio"
+                              name="accommodation"
+                              value={option.value}
+                              checked={formData.accommodation === option.value}
+                              onChange={(e) => setFormData({ ...formData, accommodation: e.target.value })}
+                              className="sr-only"
+                              required={!isDayOnly}
+                            />
+                            <span className="font-semibold">{option.label}</span>
+                            {option.limited && (
+                              <span className="text-xs bg-[#2D4A3E] text-white px-2 py-0.5 rounded-full">
+                                {bedsRemaining} left
+                              </span>
+                            )}
+                          </div>
+                          <span className={`font-bold ${formData.accommodation === option.value ? 'text-[#2D4A3E]' : 'text-[#FFE135]'}`}>
+                            {option.price}
+                          </span>
                         </label>
                       ))}
                     </div>
-                    <div className="text-white">
-                      <span className="text-2xl font-bold text-[#FFE135]">€{formData.nights * 90}</span>
-                      <span className="text-white/80 ml-2">total</span>
-                    </div>
                   </div>
-                </div>
+
+                  {/* Number of Nights (only show if castle selected) */}
+                  {formData.accommodation === 'castle' && (
+                    <div className="md:col-span-2">
+                      <label className="block text-white font-semibold mb-2">How many nights?</label>
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3">
+                          {[1, 2, 3].map((n) => (
+                            <label
+                              key={n}
+                              className={`w-12 h-12 flex items-center justify-center rounded-lg cursor-pointer transition-all font-bold text-lg ${
+                                formData.nights === n
+                                  ? 'bg-[#FFE135] text-[#2D4A3E] border-2 border-[#2D4A3E]'
+                                  : 'bg-white/30 text-white border-2 border-transparent hover:bg-white/50'
+                              }`}
+                            >
+                              <input
+                                type="radio"
+                                name="nights"
+                                value={n}
+                                checked={formData.nights === n}
+                                onChange={() => setFormData({ ...formData, nights: n })}
+                                className="sr-only"
+                              />
+                              {n}
+                            </label>
+                          ))}
+                        </div>
+                        <div className="text-white">
+                          <span className="text-2xl font-bold text-[#FFE135]">€{formData.nights * 90}</span>
+                          <span className="text-white/80 ml-2">total</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
 
