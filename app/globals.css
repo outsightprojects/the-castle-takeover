@@ -1,32 +1,11 @@
-/* Castle Takeover - v3 */
-@import 'tailwindcss';
+/* Castle Takeover */
+@import "tailwindcss/preflight" layer(base);
+@import "tailwindcss/theme" layer(theme);
+@import "tailwindcss/utilities" layer(utilities);
 
 @custom-variant dark (&:is(.dark *));
 
-:root {
-  --background: #FDEAE0;
-  --foreground: #2D4A3E;
-  --card: #FFFFFF;
-  --card-foreground: #2D4A3E;
-  --popover: #FFFFFF;
-  --popover-foreground: #2D4A3E;
-  --primary: #FF6B35;
-  --primary-foreground: #FFFFFF;
-  --secondary: #4ECDC4;
-  --secondary-foreground: #FFFFFF;
-  --muted: #FFE4B5;
-  --muted-foreground: #6B4E8E;
-  --accent: #FFE66D;
-  --accent-foreground: #2D4A3E;
-  --destructive: #FF6B6B;
-  --destructive-foreground: #FFFFFF;
-  --border: #e5e5e5;
-  --input: #e5e5e5;
-  --ring: #2D4A3E;
-  --radius: 0.625rem;
-}
-
-@theme {
+@theme inline {
   --font-sans: var(--font-fredoka), 'Fredoka', sans-serif;
   --font-mono: 'Geist Mono', 'Geist Mono Fallback';
   --color-background: #FDEAE0;
@@ -52,4 +31,14 @@
   --radius-md: 0.5rem;
   --radius-lg: 0.625rem;
   --radius-xl: 0.75rem;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
 }
