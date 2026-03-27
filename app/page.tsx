@@ -10,15 +10,13 @@ export default function Home() {
   const navItems = ['HOME', 'ABOUT', 'VENUE', 'TICKETS', "FAQ'S"]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 font-sans">
+    <div className="min-h-screen font-sans" style={{ background: 'linear-gradient(180deg, #F5D6C6 0%, #FDEAE0 30%, #E8F4F8 70%, #7FD8BE 100%)' }}>
       {/* Navigation */}
       <nav className="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto">
-        <div className="text-3xl font-bold text-white drop-shadow-lg" style={{
-          WebkitTextStroke: '2px #000',
-          paintOrder: 'stroke fill',
+        <div className="text-2xl font-bold text-[#2D4A3E]" style={{
           letterSpacing: '0.05em',
         }}>
-          THE CASTLE
+          THE CASTLE TAKEOVER
         </div>
         
         <div className="flex gap-8">
@@ -27,9 +25,8 @@ export default function Home() {
               key={item}
               onMouseEnter={() => setHoveredNav(item)}
               onMouseLeave={() => setHoveredNav(null)}
-              className="text-white font-bold text-sm transition-all duration-200 px-3 py-2"
+              className="text-[#2D4A3E] font-semibold text-sm transition-all duration-200 px-3 py-2 hover:text-[#E84B8A]"
               style={{
-                WebkitTextStroke: '1px #000',
                 transform: hoveredNav === item ? 'scale(1.1)' : 'scale(1)',
               }}
             >
@@ -40,14 +37,14 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <main className="flex items-center justify-center px-8 py-20 max-w-7xl mx-auto">
+      <main className="flex items-center justify-center px-8 py-12 max-w-7xl mx-auto">
         <div className="flex gap-16 items-center">
           {/* Left Image */}
-          <div className="flex-shrink-0 w-96">
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+          <div className="flex-shrink-0 w-[420px]">
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white/50">
               <img
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Gemini_Generated_Image_qp0sxnqp0sxnqp0s.png-qbCevOjxCNwTB0RwQ7qZO6JhQhhoG8.jpeg"
-                alt="Castle Takeover Birthday Bash"
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/hf_20260326_204051_a3b3f6c6-2a6f-4e09-845a-7454ef0d5e34-hcN986dxg3rDEIT3LrfKUBVT36Wm5O.jpeg"
+                alt="The Castle Takeover - 40th Birthday Celebration"
                 className="w-full h-auto object-cover"
               />
             </div>
@@ -56,37 +53,33 @@ export default function Home() {
           {/* Right Content */}
           <div className="flex-1 space-y-8">
             <div>
-              <p className="text-white text-lg font-light mb-2 opacity-90">Celebrate</p>
-              <h1 className="text-6xl font-bold text-white mb-4" style={{
-                WebkitTextStroke: '2px #000',
-                paintOrder: 'stroke fill',
-                lineHeight: '1.2',
-              }}>
+              <p className="text-[#E84B8A] text-lg font-medium mb-2">Three times fourty</p>
+              <h1 className="text-5xl font-bold text-[#2D4A3E] mb-4 leading-tight">
                 THE CASTLE<br />TAKEOVER
               </h1>
-              <p className="text-white text-xl font-light leading-relaxed opacity-95">
-                A 40th birthday celebration for Cari, Peter & Georg with friends and family at Schloss Dornburg.
+              <p className="text-[#4A6B5D] text-xl font-normal leading-relaxed max-w-md">
+                <span className="font-semibold text-[#E84B8A]">Cari</span>, <span className="font-semibold text-[#E84B8A]">Peter</span> & <span className="font-semibold text-[#E84B8A]">Georg</span> celebrate their 40th birthday and the people they&apos;ve met throughout their lives.
               </p>
             </div>
 
             {/* Event Details Box */}
-            <div className="border-3 border-black bg-white bg-opacity-20 backdrop-blur rounded-2xl p-6 text-white max-w-md">
-              <div className="text-lg font-bold mb-2">Schloss Dornburg</div>
-              <div className="text-base font-light">28 - 30 August 2026</div>
+            <div className="border-2 border-[#2D4A3E] bg-white/80 backdrop-blur rounded-xl p-6 max-w-sm">
+              <div className="text-xl font-bold text-[#2D4A3E] mb-1">Schloss Dornburg</div>
+              <div className="text-[#4A6B5D] font-medium">28 - 30 August 2026</div>
             </div>
 
             {/* CTA Button */}
-            <button className="bg-yellow-300 text-black font-bold text-xl px-8 py-4 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 border-3 border-black">
-              RESERVE NOW
+            <button className="bg-[#FFE135] text-[#2D4A3E] font-bold text-lg px-8 py-4 rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 border-2 border-[#2D4A3E]">
+              Reserve Now
             </button>
           </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="text-center text-white text-sm py-8 opacity-75">
-        <p>Join us for an unforgettable castle birthday celebration</p>
-        <p className="mt-2">nosexintthepool.com</p>
+      <footer className="text-center text-[#4A6B5D] text-sm py-8">
+        <p>Join us for an unforgettable time and reserve a bed in a real castle</p>
+        <p className="mt-2 font-semibold">thecastletakeover.de</p>
       </footer>
     </div>
   )

@@ -22,9 +22,10 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    border-color: #e5e5e5;
   }
   body {
-    @apply bg-background text-foreground;
+    background: #FDEAE0;
+    color: #2D4A3E;
   }
 }
