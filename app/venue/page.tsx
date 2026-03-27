@@ -3,12 +3,54 @@
 import Link from 'next/link'
 
 const galleryImages = [
-  { src: '/images/schloss-1.jpg', alt: 'Schloss Dornburg exterior' },
-  { src: '/images/schloss-2.jpg', alt: 'Schloss Dornburg garden terrace' },
-  { src: '/images/schloss-3.jpg', alt: 'Schloss Dornburg grand hall' },
-  { src: '/images/schloss-4.jpg', alt: 'Schloss Dornburg lake view' },
-  { src: '/images/schloss-5.jpg', alt: 'Schloss Dornburg courtyard' },
-  { src: '/images/schloss-6.jpg', alt: 'Schloss Dornburg evening' },
+  {
+    src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DSC03822_VSCO-vsSBtcFYAVCSxfu5puHaMMWQafFGwn.jpeg',
+    alt: 'Schloss Dornburg front facade, cobblestone path and blue sky',
+  },
+  {
+    src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_4616-wvde8nVBfmqH5dsOG8TjlTlQs5XWBC.jpeg',
+    alt: 'Schloss Dornburg facade framed by trees',
+  },
+  {
+    src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_6363-tCai6Eh7g82lDmAokMkZNuSw2vWyeM.jpeg',
+    alt: 'Outdoor dining table set with glasses in front of Schloss Dornburg',
+  },
+  {
+    src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/PHOTO-2025-08-31-13-45-14-lv1MmWGqlTSWsz6B265K45rdcl6jTT.jpg',
+    alt: 'Castle entrance at night with dramatic red and blue party lighting',
+  },
+  {
+    src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_4643-zaKmtTX3veSUwSVO2k0KrXWeocCujs.jpeg',
+    alt: 'Grand chandelier beneath ornate baroque painted ceiling',
+  },
+  {
+    src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/SchlossDornburg-1-2wawD7dw6P6og2O9T190yHHfcgmTFu.png',
+    alt: 'Party dancers in hazy golden light inside Schloss Dornburg',
+  },
+  {
+    src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DSC03780_VSCO-2-utqXwSJOGKj8gWtNA48GUNCQ0Fu7dB.jpeg',
+    alt: 'Ornate iron staircase railing with afternoon light on wooden floors',
+  },
+  {
+    src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_5255-zloq7JyG72aMeeAiMuPynAMRUm3nhm.jpeg',
+    alt: 'Yellow velvet sofa against distressed blue-painted walls',
+  },
+  {
+    src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_5251-t8PB1EK1GFMwIhFKNFKwq9f9hyzlhv.jpeg',
+    alt: 'Open castle window looking out to autumn birch trees',
+  },
+  {
+    src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/E97E0F2D-7A6A-4C74-A713-A9D6379FE261-K9GdWg3hA5seapXfYPl6nboP4rDaUH.jpeg',
+    alt: 'Bedroom with purple throw on white bed and distressed blue walls',
+  },
+  {
+    src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/DSC03786_VSCO-qCONnEif6g8Qs3dwrRf2zNdlC3pUKa.jpeg',
+    alt: 'Interior staircase through doorway with ornate iron scrollwork',
+  },
+  {
+    src: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/SchlossDornburg-iLNfrZnNsVTxPTcJ5ziL3B7ee1a8dm.png',
+    alt: 'Dramatic light rays through tall windows during a Schloss Dornburg event',
+  },
 ]
 
 export default function VenuePage() {
@@ -87,16 +129,16 @@ export default function VenuePage() {
         {/* Gallery */}
         <h2 className="text-4xl font-bold text-[#E84B8A] mb-8">Gallery</h2>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="columns-3 gap-4 space-y-4">
           {galleryImages.map((img) => (
             <div
               key={img.src}
-              className="aspect-[4/3] rounded-lg overflow-hidden border border-[#c9b99a] shadow-sm"
+              className="break-inside-avoid rounded-lg overflow-hidden border border-[#c9b99a] shadow-sm"
             >
               <img
                 src={img.src}
                 alt={img.alt}
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                className="w-full h-auto block hover:scale-105 transition-transform duration-300"
               />
             </div>
           ))}
