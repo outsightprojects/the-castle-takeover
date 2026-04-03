@@ -419,13 +419,13 @@ export default function RSVPPage() {
                 </div>
 
                 <div className="border-t border-c-border pt-6">
-                  <label className="block text-c-white font-medium text-sm mb-3">Transport</label>
+                  <label className="block text-c-white font-medium text-sm mb-3">How will you get to the castle?</label>
                   <div className="grid grid-cols-2 gap-2">
                     {[
                       { value: 'car', label: 'Car' },
                       { value: 'train', label: 'Train' },
                       { value: 'carpool', label: 'Carpool' },
-                      { value: 'unsure', label: "Don't know" },
+                      { value: 'unsure', label: "Don't know yet" },
                     ].map((mode) => (
                       <label key={mode.value} className={`text-center p-3 transition-all min-h-[48px] flex items-center justify-center ${optionClass(formData.transportMode === mode.value)}`}>
                         <input type="radio" name="transportMode" value={mode.value} checked={formData.transportMode === mode.value} onChange={(e) => setFormData({ ...formData, transportMode: e.target.value })} className="sr-only" />
@@ -434,11 +434,34 @@ export default function RSVPPage() {
                     ))}
                   </div>
 
+                  {formData.transportMode === 'car' && (
+                    <p className="text-c-dim text-xs mt-3">
+                      ~1.5h from Berlin (A2), ~4.5h from Munich, ~4h from Frankfurt. Parking on the castle grounds. If you have space, consider offering a ride!
+                    </p>
+                  )}
+
                   {formData.transportMode === 'train' && (
-                    <label className="flex items-center gap-3 cursor-pointer mt-3 bg-c-surface border border-c-border p-3 min-h-[48px]">
-                      <input type="checkbox" checked={formData.needsShuttle} onChange={(e) => setFormData({ ...formData, needsShuttle: e.target.checked })} className="w-4 h-4 accent-c-gold" />
-                      <span className="text-c-muted text-sm">I&apos;d need a shuttle from the station</span>
-                    </label>
+                    <>
+                      <p className="text-c-dim text-xs mt-3">
+                        Nearest ICE station: Magdeburg Hbf (~1.5h from Berlin, ~3.5h from Frankfurt). From there ~20 min to Gommern by regional train.
+                      </p>
+                      <label className="flex items-center gap-3 cursor-pointer mt-3 bg-c-surface border border-c-border p-3 min-h-[48px]">
+                        <input type="checkbox" checked={formData.needsShuttle} onChange={(e) => setFormData({ ...formData, needsShuttle: e.target.checked })} className="w-4 h-4 accent-c-gold" />
+                        <span className="text-c-muted text-sm">I&apos;d need a shuttle from the station</span>
+                      </label>
+                    </>
+                  )}
+
+                  {formData.transportMode === 'carpool' && (
+                    <p className="text-c-dim text-xs mt-3">
+                      We&apos;ll help connect drivers and riders closer to the date. Just pick this and we&apos;ll sort it out.
+                    </p>
+                  )}
+
+                  {formData.transportMode === 'unsure' && (
+                    <p className="text-c-dim text-xs mt-3">
+                      No worries — you can let us know later. Check the venue page for directions when you&apos;re ready.
+                    </p>
                   )}
                 </div>
               </div>

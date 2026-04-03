@@ -69,8 +69,13 @@ export async function POST(request: NextRequest) {
         select: { name: mapAttendance(attendance) },
       },
       'Kontakt': {
-        rich_text: [{ text: { content: [email, phone].filter(Boolean).join(' | ') } }],
+        rich_text: [{ text: { content: email } }],
       },
+      ...(phone ? {
+        'Telefon': {
+          phone_number: phone,
+        },
+      } : {}),
       'Beitrag €': {
         number: contribution || 90,
       },
@@ -82,22 +87,25 @@ export async function POST(request: NextRequest) {
       },
     }
 
-    if (stayDuration !== 'day-only') {
+    if (stayDuration === 'day-only') {
+      properties['Übernachtung'] = { select: { name: 'Nein' } }
+    } else if (stayDuration === 'unsure-stay') {
+      properties['Übernachtung'] = { select: { name: 'Unklar' } }
+      properties['Unterkunft'] = { select: { name: mapAccommodation(accommodationPreference) } }
+    } else {
       properties['Übernachtung'] = { select: { name: 'Ja' } }
       properties['Nächte'] = { select: { name: mapStayDuration(stayDuration) } }
       properties['Unterkunft'] = { select: { name: mapAccommodation(accommodationPreference) } }
-    } else {
-      properties['Übernachtung'] = { select: { name: 'Nein' } }
     }
 
-    if (transportMode) {
-      const transportMap: Record<string, string> = {
-        'car': 'Auto',
-        'train': 'Zug',
-        'carpool': 'Mitfahrgelegenheit',
-      }
-      properties['Anreise'] = { select: { name: transportMap[transportMode] || 'Unklar' } }
+    // Transport mode → Anreise select
+    const transportMap: Record<string, string> = {
+      'car': 'Auto',
+      'train': 'Zug',
+      'carpool': 'Mitfahrgelegenheit',
+      'unsure': 'Unklar',
     }
+    properties['Anreise'] = { select: { name: transportMap[transportMode] || 'Unklar' } }
 
     if (dietaryRestrictions) {
       properties['Ernährung'] = { rich_text: [{ text: { content: dietaryRestrictions } }] }
@@ -107,8 +115,16 @@ export async function POST(request: NextRequest) {
       properties['Skills / Beitrag'] = { rich_text: [{ text: { content: skills } }] }
     }
 
+    // Arrival day → Ankunftstag select
+    const arrivalMap: Record<string, string> = {
+      'friday': 'Freitag',
+      'saturday': 'Samstag',
+      'unsure-arrival': 'Noch unklar',
+    }
+    properties['Ankunftstag'] = { select: { name: arrivalMap[arrivalDay] || 'Noch unklar' } }
+
+    // Notes — freetext only, plus camping/self info that has no dedicated field
     const noteParts: string[] = []
-    if (arrivalDay) noteParts.push(`Anreise: ${arrivalDay}`)
     if (accommodationPreference === 'camping') noteParts.push('Unterkunft: Camping')
     if (accommodationPreference === 'self') noteParts.push('Unterkunft: Selbst organisiert')
     if (notes) noteParts.push(notes)
