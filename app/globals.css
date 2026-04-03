@@ -1,0 +1,171 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Dark cinematic palette */
+  --color-c-black: #0A0A0A;
+  --color-c-surface: #141414;
+  --color-c-elevated: #1E1E1E;
+  --color-c-border: rgba(255, 255, 255, 0.08);
+
+  /* Warm accents — castle */
+  --color-c-gold: #C9A84C;
+  --color-c-gold-light: #E2C872;
+  --color-c-terracotta: #C4635A;
+  --color-c-terracotta-light: #D4726A;
+
+  /* Cool accents — pool */
+  --color-c-aqua: #4ECDC4;
+  --color-c-aqua-light: #7EDDD6;
+  --color-c-aqua-dim: #2A8F89;
+  --color-c-pool-deep: #0A2E2C;
+
+  /* Text */
+  --color-c-white: #F5F5F0;
+  --color-c-muted: #8A8A80;
+  --color-c-dim: #555550;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #0A0A0A;
+    color: #F5F5F0;
+  }
+}
+
+/* Film grain overlay — subtle texture */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* Custom range slider — gold accent */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #C9A84C;
+  border: 2px solid #0A0A0A;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(201, 168, 76, 0.3);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #C9A84C;
+  border: 2px solid #0A0A0A;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(201, 168, 76, 0.3);
+}
+
+/* Horizontal rule — gold */
+.rule {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(201, 168, 76, 0.3),
+    transparent
+  );
+}
+
+/* Horizontal rule — aqua */
+.rule-aqua {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(78, 205, 196, 0.3),
+    transparent
+  );
+}
+
+/* Wave divider SVG */
+.wave-divider {
+  width: 100%;
+  height: 48px;
+  overflow: hidden;
+}
+
+.wave-divider svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Shimmer for pool text */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    #4ECDC4 0%,
+    #7EDDD6 25%,
+    #C9A84C 50%,
+    #7EDDD6 75%,
+    #4ECDC4 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 6s linear infinite;
+}
+
+/* Shimmer for title — gold/white */
+.text-shimmer-gold {
+  background: linear-gradient(
+    90deg,
+    #F5F5F0 0%,
+    #F5F5F0 35%,
+    #C9A84C 50%,
+    #F5F5F0 65%,
+    #F5F5F0 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 8s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-shimmer,
+  .text-shimmer-gold {
+    animation: none;
+    background-size: 100% auto;
+  }
+
+  .text-shimmer {
+    background: #4ECDC4;
+  }
+
+  .text-shimmer-gold {
+    background: #F5F5F0;
+  }
+}
