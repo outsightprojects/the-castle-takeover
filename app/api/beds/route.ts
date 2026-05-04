@@ -22,10 +22,10 @@ async function notionQuery(dsId: string, filter?: Record<string, unknown>) {
 
 export async function GET() {
   try {
-    // 1. Read per-host allocations from config DB
+    // 1. Read per-host castle allocations from config DB
+    // (Village/hotel stays are self-arranged; we don't track capacity for them.)
     const configData = await notionQuery(CONFIG_DS_ID)
     const allocations: Record<string, number> = { Georg: 30, Cari: 30, Peter: 30 }
-    let totalVillageBeds = 70
 
     for (const page of configData.results) {
       const name = page.properties?.Name?.title?.[0]?.plain_text as string
@@ -33,7 +33,6 @@ export async function GET() {
       if (name === 'Betten Georg') allocations.Georg = wert
       if (name === 'Betten Cari') allocations.Cari = wert
       if (name === 'Betten Peter') allocations.Peter = wert
-      if (name === 'Dorf Betten') totalVillageBeds = wert
     }
 
     const totalCastleBeds = allocations.Georg + allocations.Cari + allocations.Peter
@@ -50,34 +49,26 @@ export async function GET() {
           ],
         },
         { property: 'Übernachtung', select: { equals: 'Ja' } },
+        { property: 'Unterkunft', select: { equals: 'Schloss' } },
       ],
     })
 
-    const taken: Record<string, { castle: number; village: number }> = {
-      Georg: { castle: 0, village: 0 },
-      Cari: { castle: 0, village: 0 },
-      Peter: { castle: 0, village: 0 },
-    }
+    const taken: Record<string, number> = { Georg: 0, Cari: 0, Peter: 0 }
 
     for (const page of guestData.results) {
       const props = page.properties as Record<string, any>
       const host = props.Host?.select?.name as string
-      const unterkunft = props.Unterkunft?.select?.name as string
-
-      if (!taken[host]) continue
-      if (unterkunft === 'Schloss') taken[host].castle++
-      else if (unterkunft === 'Dorf') taken[host].village++
+      if (host in taken) taken[host]++
     }
 
-    const totalCastleTaken = taken.Georg.castle + taken.Cari.castle + taken.Peter.castle
-    const totalVillageTaken = taken.Georg.village + taken.Cari.village + taken.Peter.village
+    const totalCastleTaken = taken.Georg + taken.Cari + taken.Peter
 
     const perHost: Record<string, { total: number; taken: number; available: number }> = {}
     for (const host of HOSTS) {
       perHost[host] = {
         total: allocations[host],
-        taken: taken[host].castle,
-        available: allocations[host] - taken[host].castle,
+        taken: taken[host],
+        available: allocations[host] - taken[host],
       }
     }
 
@@ -86,11 +77,6 @@ export async function GET() {
         total: totalCastleBeds,
         taken: totalCastleTaken,
         available: totalCastleBeds - totalCastleTaken,
-      },
-      village: {
-        total: totalVillageBeds,
-        taken: totalVillageTaken,
-        available: totalVillageBeds - totalVillageTaken,
       },
       perHost,
     }, {
@@ -102,7 +88,6 @@ export async function GET() {
     console.error('Beds query error:', error)
     return NextResponse.json({
       castle: { total: 90, taken: 0, available: 90 },
-      village: { total: 70, taken: 0, available: 70 },
       perHost: {
         Georg: { total: 30, taken: 0, available: 30 },
         Cari: { total: 30, taken: 0, available: 30 },

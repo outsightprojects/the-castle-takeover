@@ -335,9 +335,9 @@ export default function VenuePage() {
             },
             {
               icon: Home,
-              title: 'Village Nearby',
-              desc: 'Additional beds in houses 5 minutes away. We help coordinate. Same vibe, short walk.',
-              tag: '~70 beds',
+              title: 'Village or hotel',
+              desc: 'Houses or hotels ~5 min from castle. Self-arranged — book your own.',
+              tag: 'Self-arrange',
             },
             {
               icon: Tent,
@@ -366,9 +366,6 @@ export default function VenuePage() {
           ))}
         </div>
 
-        <p className="text-c-dim text-xs text-center mt-8 font-mono tracking-wide">
-          You can also book your own hotel or Airbnb nearby.
-        </p>
       </section>
 
       {/* CTA */}

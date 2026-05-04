@@ -130,10 +130,9 @@ export async function POST(request: NextRequest) {
       properties['Nachfassen'] = { date: { start: followUp.toISOString().split('T')[0] } }
     }
 
-    // Notes — freetext only, plus camping/self info that has no dedicated field
+    // Notes — freetext only, plus camping flag (no dedicated Notion field for it)
     const noteParts: string[] = []
     if (accommodationPreference === 'camping') noteParts.push('Unterkunft: Camping')
-    if (accommodationPreference === 'self') noteParts.push('Unterkunft: Selbst organisiert')
     if (notes) noteParts.push(notes)
 
     if (noteParts.length > 0) {

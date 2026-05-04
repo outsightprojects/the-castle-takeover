@@ -223,7 +223,7 @@ export default function AboutPage() {
           />
           <FAQItem
             question="Where do I sleep?"
-            answer="About 90 beds in the castle (&euro;90 per bed — mostly shared rooms, some doubles, we'll fit everyone's needs), 70 more in a nearby village, plus camping on the grounds. Or book your own thing. You pick in the RSVP."
+            answer="About 90 beds in the castle (&euro;90 per bed — mostly shared rooms, some doubles, we'll fit everyone's needs), village or hotel stays nearby (&euro;50+ contribution, self-arranged), or camping on the grounds. You pick in the RSVP."
           />
         </div>
       </section>

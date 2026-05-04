@@ -12,7 +12,6 @@ interface HostBeds {
 
 interface BedData {
   castle: { total: number; taken: number; available: number }
-  village: { total: number; taken: number; available: number }
   perHost: Record<string, HostBeds>
 }
 
@@ -49,7 +48,6 @@ export default function RSVPPage() {
       .catch(() => {
         setBeds({
           castle: { total: 90, taken: 0, available: 90 },
-          village: { total: 70, taken: 0, available: 70 },
           perHost: {
             Georg: { total: 30, taken: 0, available: 30 },
             Cari: { total: 30, taken: 0, available: 30 },
@@ -64,9 +62,6 @@ export default function RSVPPage() {
   const hostCastleAvailable = hostBeds?.available ?? 30
   const hostCastleTotal = hostBeds?.total ?? 30
   const castleFull = hostCastleAvailable <= 0
-
-  const villageBedsRemaining = beds?.village.available ?? 70
-  const totalVillageBeds = beds?.village.total ?? 70
 
   const isDayOnly = formData.stayDuration === 'day-only'
 
@@ -382,9 +377,8 @@ export default function RSVPPage() {
                         avail: castleFull ? null : `${hostCastleAvailable}/${hostCastleTotal}`,
                         disabled: castleFull,
                       },
-                      { value: 'village', label: 'Village', desc: '5 min walk, we help coordinate', price: '\u20AC50+ contribution', avail: `${villageBedsRemaining}/${totalVillageBeds}`, disabled: false },
+                      { value: 'village', label: 'Village or hotel', desc: 'Houses or hotels ~5 min from castle. Self-arranged.', price: '\u20AC50+ contribution', avail: null, disabled: false },
                       { value: 'camping', label: 'Camping', desc: 'Tent or camper on the grounds', price: '\u20AC50+ contribution', avail: null, disabled: false },
-                      { value: 'self', label: 'Own arrangement', desc: 'Hotel, Airbnb, etc.', price: '\u20AC50+ contribution', avail: null, disabled: false },
                     ].map((option) => (
                       <label key={option.value} className={`block p-4 transition-all min-h-[48px] ${optionClass(formData.accommodationPreference === option.value, option.disabled)}`}>
                         <input type="radio" name="accommodationPreference" value={option.value} checked={formData.accommodationPreference === option.value} disabled={option.disabled} onChange={(e) => {
