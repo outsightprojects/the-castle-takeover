@@ -4,9 +4,16 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { PageShell } from '@/components/page-shell'
 
+interface HostBeds {
+  total: number
+  taken: number
+  available: number
+}
+
 interface BedData {
   castle: { total: number; taken: number; available: number }
   village: { total: number; taken: number; available: number }
+  perHost: Record<string, HostBeds>
 }
 
 export default function RSVPPage() {
@@ -15,9 +22,11 @@ export default function RSVPPage() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [beds, setBeds] = useState<BedData | null>(null)
+  const [customAmount, setCustomAmount] = useState(false)
 
   const [formData, setFormData] = useState({
     attendance: '',
+    invitedBy: '',
     arrivalDay: '',
     stayDuration: '',
     accommodationPreference: '',
@@ -27,7 +36,6 @@ export default function RSVPPage() {
     name: '',
     email: '',
     phone: '',
-    invitedBy: '',
     dietaryRestrictions: '',
     skills: '',
     notes: '',
@@ -42,17 +50,29 @@ export default function RSVPPage() {
         setBeds({
           castle: { total: 90, taken: 0, available: 90 },
           village: { total: 70, taken: 0, available: 70 },
+          perHost: {
+            Georg: { total: 30, taken: 0, available: 30 },
+            Cari: { total: 30, taken: 0, available: 30 },
+            Peter: { total: 30, taken: 0, available: 30 },
+          },
         })
       })
   }, [])
 
-  const castleBedsRemaining = beds?.castle.available ?? 90
+  // Per-host castle availability
+  const hostBeds = beds?.perHost?.[formData.invitedBy]
+  const hostCastleAvailable = hostBeds?.available ?? 30
+  const hostCastleTotal = hostBeds?.total ?? 30
+  const castleFull = hostCastleAvailable <= 0
+
   const villageBedsRemaining = beds?.village.available ?? 70
-  const totalCastleBeds = beds?.castle.total ?? 90
   const totalVillageBeds = beds?.village.total ?? 70
 
   const isDayOnly = formData.stayDuration === 'day-only'
-  const stepSequence = isDayOnly ? [1, 2, 4, 5] : [1, 2, 3, 4, 5]
+
+  // Steps: 1=attendance, 2=host, 3=arrival, 4=accommodation, 5=contribution, 6=contact
+  // Day-only skips step 4 (accommodation)
+  const stepSequence = isDayOnly ? [1, 2, 3, 5, 6] : [1, 2, 3, 4, 5, 6]
   const totalSteps = stepSequence.length
   const currentStepIndex = stepSequence.indexOf(step)
   const displayStep = currentStepIndex + 1
@@ -75,6 +95,7 @@ export default function RSVPPage() {
       }
 
       setIsSubmitted(true)
+      window.scrollTo({ top: 0 })
     } catch (err) {
       setSubmitError(
         err instanceof Error ? err.message : 'Something went wrong. Please try again.'
@@ -87,10 +108,11 @@ export default function RSVPPage() {
   const canProceed = () => {
     switch (step) {
       case 1: return formData.attendance !== ''
-      case 2: return formData.arrivalDay !== '' && formData.stayDuration !== ''
-      case 3: return formData.accommodationPreference !== ''
-      case 4: return formData.accommodationPreference === 'castle' ? formData.contribution >= 90 : formData.contribution >= 20
-      case 5: return formData.name !== '' && formData.email !== '' && formData.invitedBy !== ''
+      case 2: return formData.invitedBy !== ''
+      case 3: return formData.arrivalDay !== '' && formData.stayDuration !== ''
+      case 4: return formData.accommodationPreference !== ''
+      case 5: return formData.accommodationPreference === 'castle' ? formData.contribution >= 90 : formData.contribution >= 50
+      case 6: return formData.name !== '' && formData.email !== ''
       default: return false
     }
   }
@@ -105,7 +127,6 @@ export default function RSVPPage() {
     if (prevIndex >= 0) setStep(stepSequence[prevIndex])
   }
 
-  // Shared option button style
   const optionClass = (selected: boolean, disabled = false) =>
     disabled
       ? 'opacity-30 cursor-not-allowed bg-c-surface border border-c-border'
@@ -118,7 +139,7 @@ export default function RSVPPage() {
   const calendarStart = '20260828T140000'
   const calendarEnd = '20260830T140000'
   const calendarLocation = 'Schloss Dornburg, Lindenweg 1, 39264 Gommern, Germany'
-  const calendarDesc = 'Peter, Cari & Georg\'s joint birthday weekend. Castle. Pool. Party. thecastletakeover.de'
+  const calendarDesc = 'Peter, Cari & Georg\'s joint birthday weekend. Castle. Party. Weekend. thecastletakeover.de'
 
   const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(calendarTitle)}&dates=${calendarStart}/${calendarEnd}&location=${encodeURIComponent(calendarLocation)}&details=${encodeURIComponent(calendarDesc)}`
 
@@ -139,8 +160,7 @@ export default function RSVPPage() {
     ? URL.createObjectURL(new Blob([icsContent], { type: 'text/calendar' }))
     : '#'
 
-  // PayPal Money Pool URL — replace with your actual pool link
-  const paypalPoolUrl = 'https://www.paypal.com/pools/9nZT9mha8K?sr=wccr'
+  const paypalPoolUrl = 'https://www.paypal.com/pool/9nZT9mha8K?sr=wccr'
 
   // Success screen
   if (isSubmitted) {
@@ -175,72 +195,41 @@ export default function RSVPPage() {
               Join the WhatsApp Group
             </a>
 
-            {/* Add to calendar */}
+            {/* Calendar */}
             <div className="bg-c-surface border border-c-border p-6">
               <p className="text-c-white font-medium text-sm mb-4">Save the date</p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <a
-                  href={googleCalUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 border border-c-border text-c-muted font-mono text-xs tracking-widest uppercase px-5 py-3 hover:text-c-white hover:border-c-white/20 transition-colors min-h-[48px]"
-                >
+                <a href={googleCalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 border border-c-border text-c-muted font-mono text-xs tracking-widest uppercase px-5 py-3 hover:text-c-white hover:border-c-white/20 transition-colors min-h-[48px]">
                   Google Calendar
                 </a>
-                <a
-                  href={icsBlob}
-                  download="castle-takeover.ics"
-                  className="inline-flex items-center justify-center gap-2 border border-c-border text-c-muted font-mono text-xs tracking-widest uppercase px-5 py-3 hover:text-c-white hover:border-c-white/20 transition-colors min-h-[48px]"
-                >
+                <a href={icsBlob} download="castle-takeover.ics" className="inline-flex items-center justify-center gap-2 border border-c-border text-c-muted font-mono text-xs tracking-widest uppercase px-5 py-3 hover:text-c-white hover:border-c-white/20 transition-colors min-h-[48px]">
                   Apple Calendar
                 </a>
               </div>
-              <p className="text-c-dim text-xs mt-3">
-                28 Aug (Fri) 14:00 &ndash; 30 Aug (Sun) 14:00
-              </p>
+              <p className="text-c-dim text-xs mt-3">28 Aug (Fri) 14:00 &ndash; 30 Aug (Sun) 14:00</p>
             </div>
 
             {/* Payment */}
             <div className="bg-c-surface border border-c-border p-6 mt-4">
               <p className="text-c-muted text-sm mb-1">Your solidarity contribution</p>
-              <p className="text-4xl font-serif font-bold text-c-gold mb-6 tabular-nums">
-                &euro;{formData.contribution}
-              </p>
-
+              <p className="text-4xl font-serif font-bold text-c-gold mb-6 tabular-nums">&euro;{formData.contribution}</p>
               <div className="border-t border-c-border pt-6">
-                <p className="text-c-white font-medium text-sm mb-4">
-                  Send to the PayPal Money Pool
-                </p>
-
+                <p className="text-c-white font-medium text-sm mb-4">Send to the PayPal Money Pool</p>
                 <div className="bg-white rounded p-3 inline-block mb-4">
-                  <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(paypalPoolUrl)}`}
-                    alt="PayPal Money Pool QR Code — scan to contribute"
-                    width={160}
-                    height={160}
-                    className="w-40 h-40"
-                  />
+                  <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(paypalPoolUrl)}`} alt="PayPal Money Pool QR Code" width={160} height={160} className="w-40 h-40" />
                 </div>
-
-                <p className="text-c-muted text-sm mb-2">
-                  Scan the QR code or tap below
-                </p>
-
-                <a
-                  href={paypalPoolUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 bg-c-gold text-c-black font-semibold px-6 py-3 text-sm tracking-widest uppercase hover:bg-c-gold-light active:scale-[0.98] transition-all min-h-[48px]"
-                >
+                <p className="text-c-muted text-sm mb-2">Scan the QR code or tap below</p>
+                <a href={paypalPoolUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 bg-c-gold text-c-black font-semibold px-6 py-3 text-sm tracking-widest uppercase hover:bg-c-gold-light active:scale-[0.98] transition-all min-h-[48px]">
                   Open PayPal Pool
                 </a>
-
                 <p className="text-c-dim text-xs mt-4">
-                  Include your name in the payment note.
-                  {formData.accommodationPreference === 'castle' && (
-                    <> The &euro;90 minimum secures your castle bed — early payment gets priority.</>
-                  )}
+                  Include your name in the payment note so we can match it up.
                 </p>
+                {formData.accommodationPreference === 'castle' && formData.attendance !== 'yes' && (
+                  <p className="text-c-muted text-xs mt-3">
+                    Once you&apos;re sure you&apos;re joining, drop us a message — we&apos;ll sort out your castle bed then.
+                  </p>
+                )}
               </div>
             </div>
 
@@ -250,10 +239,7 @@ export default function RSVPPage() {
               <p className="text-c-gold font-mono text-sm mt-1">thecastletakeover.de</p>
             </div>
 
-            <Link
-              href="/"
-              className="inline-block mt-8 bg-c-gold text-c-black font-semibold px-8 py-3 text-sm tracking-widest uppercase hover:bg-c-gold-light active:scale-[0.98] transition-all min-h-[48px]"
-            >
+            <Link href="/" className="inline-block mt-8 bg-c-gold text-c-black font-semibold px-8 py-3 text-sm tracking-widest uppercase hover:bg-c-gold-light active:scale-[0.98] transition-all min-h-[48px]">
               Back to Home
             </Link>
           </div>
@@ -267,30 +253,15 @@ export default function RSVPPage() {
       <div className="px-6 md:px-8 py-12 md:py-20 max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-10">
-          <p className="font-mono text-[10px] tracking-[0.3em] uppercase text-c-gold mb-4">
-            Join Us
-          </p>
-          <h1 className="font-serif text-4xl md:text-5xl font-bold text-c-white leading-tight mb-3">
-            RSVP
-          </h1>
-          <p className="text-c-muted">
-            Not just a party — a shared weekend with friends old and new.
-          </p>
+          <p className="font-mono text-[10px] tracking-[0.3em] uppercase text-c-gold mb-4">Join Us</p>
+          <h1 className="font-serif text-4xl md:text-5xl font-bold text-c-white leading-tight mb-3">RSVP</h1>
+          <p className="text-c-muted">Not just a party — a shared weekend with friends old and new.</p>
         </div>
 
         {/* Progress */}
         <div className="flex items-center justify-center gap-2 mb-10">
           {stepSequence.map((_, i) => (
-            <div
-              key={i}
-              className={`h-0.5 rounded-full transition-all ${
-                i === currentStepIndex
-                  ? 'w-8 bg-c-gold'
-                  : i < currentStepIndex
-                  ? 'w-4 bg-c-gold/40'
-                  : 'w-4 bg-c-border'
-              }`}
-            />
+            <div key={i} className={`h-0.5 rounded-full transition-all ${i === currentStepIndex ? 'w-8 bg-c-gold' : i < currentStepIndex ? 'w-4 bg-c-gold/40' : 'w-4 bg-c-border'}`} />
           ))}
         </div>
 
@@ -303,7 +274,6 @@ export default function RSVPPage() {
               <div className="flex-1">
                 <h2 className="text-xl font-semibold text-c-white mb-1 tracking-tight">Are you joining us?</h2>
                 <p className="text-c-dim text-sm mb-8 font-mono tracking-wide">28.08 &ndash; 30.08.2026 &middot; Schloss Dornburg</p>
-
                 <div className="space-y-3">
                   {[
                     { value: 'yes', label: 'Yes, definitely' },
@@ -316,19 +286,32 @@ export default function RSVPPage() {
                     </label>
                   ))}
                 </div>
-
                 {formData.attendance && (
                   <div className="border-t border-c-border pt-6 mt-8">
-                    <p className="text-c-dim text-sm">
-                      Bringing a friend? Share the link — everyone RSVPs individually.
-                    </p>
+                    <p className="text-c-dim text-sm">Bringing a friend? Share the link — everyone RSVPs individually.</p>
                   </div>
                 )}
               </div>
             )}
 
-            {/* Step 2: Arrival & Stay */}
+            {/* Step 2: Host */}
             {step === 2 && (
+              <div className="flex-1">
+                <h2 className="text-xl font-semibold text-c-white mb-1 tracking-tight">Who invited you?</h2>
+                <p className="text-c-dim text-sm mb-8">This helps us organise the weekend</p>
+                <div className="grid grid-cols-3 gap-3">
+                  {['Georg', 'Cari', 'Peter'].map((host) => (
+                    <label key={host} className={`text-center py-5 transition-all font-semibold text-lg min-h-[64px] flex items-center justify-center ${optionClass(formData.invitedBy === host)}`}>
+                      <input type="radio" name="invitedBy" value={host} checked={formData.invitedBy === host} onChange={(e) => setFormData({ ...formData, invitedBy: e.target.value })} className="sr-only" />
+                      {host}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Arrival & Stay */}
+            {step === 3 && (
               <div className="flex-1">
                 <h2 className="text-xl font-semibold text-c-white mb-1 tracking-tight">When will you be there?</h2>
                 <p className="text-c-dim text-sm mb-8">Helps us plan food, logistics, and the flow</p>
@@ -374,8 +357,11 @@ export default function RSVPPage() {
               </div>
             )}
 
-            {/* Step 3: Accommodation & Transport */}
-            {step === 3 && (
+            {/* Step 4: Accommodation & Transport */}
+            {step === 4 && (() => {
+              const isLikely = formData.attendance === 'likely' || formData.attendance === 'maybe'
+
+              return (
               <div className="flex-1">
                 <h2 className="text-xl font-semibold text-c-white mb-1 tracking-tight">Where will you sleep?</h2>
                 <p className="text-c-dim text-sm mb-8">This helps us plan — nothing&apos;s locked in yet</p>
@@ -384,13 +370,23 @@ export default function RSVPPage() {
                   <label className="block text-c-white font-medium text-sm mb-3">Accommodation</label>
                   <div className="space-y-2">
                     {[
-                      { value: 'castle', label: 'Castle', desc: 'Sleep in the castle itself \u2014 min. \u20AC90 contribution', avail: `${castleBedsRemaining}/${totalCastleBeds}` },
-                      { value: 'village', label: 'Village', desc: '5 min walk, we help coordinate', avail: `${villageBedsRemaining}/${totalVillageBeds}` },
-                      { value: 'camping', label: 'Camping', desc: 'Tent or camper on the grounds', avail: null },
-                      { value: 'self', label: 'Own arrangement', desc: 'Hotel, Airbnb, etc.', avail: null },
+                      {
+                        value: 'castle',
+                        label: 'Castle',
+                        desc: castleFull
+                          ? `Castle beds are currently full`
+                          : isLikely
+                          ? 'Mostly shared rooms, some doubles \u2014 once you\u2019re sure, let us know'
+                          : 'Mostly shared rooms, some doubles \u2014 \u20AC90 per bed',
+                        avail: castleFull ? null : `${hostCastleAvailable}/${hostCastleTotal}`,
+                        disabled: castleFull,
+                      },
+                      { value: 'village', label: 'Village', desc: '5 min walk, we help coordinate', avail: `${villageBedsRemaining}/${totalVillageBeds}`, disabled: false },
+                      { value: 'camping', label: 'Camping', desc: 'Tent or camper on the grounds', avail: null, disabled: false },
+                      { value: 'self', label: 'Own arrangement', desc: 'Hotel, Airbnb, etc.', avail: null, disabled: false },
                     ].map((option) => (
-                      <label key={option.value} className={`block p-4 transition-all min-h-[48px] ${optionClass(formData.accommodationPreference === option.value)}`}>
-                        <input type="radio" name="accommodationPreference" value={option.value} checked={formData.accommodationPreference === option.value} onChange={(e) => {
+                      <label key={option.value} className={`block p-4 transition-all min-h-[48px] ${optionClass(formData.accommodationPreference === option.value, option.disabled)}`}>
+                        <input type="radio" name="accommodationPreference" value={option.value} checked={formData.accommodationPreference === option.value} disabled={option.disabled} onChange={(e) => {
                           const val = e.target.value
                           setFormData({
                             ...formData,
@@ -404,18 +400,13 @@ export default function RSVPPage() {
                             <span className={`text-xs ${formData.accommodationPreference === option.value ? 'text-c-black/60' : 'text-c-dim'}`}>{option.desc}</span>
                           </div>
                           {option.avail && (
-                            <span className={`font-mono text-xs ${formData.accommodationPreference === option.value ? 'text-c-black/60' : 'text-c-dim'}`}>{option.avail}</span>
+                            <span className={`font-mono text-xs shrink-0 ml-3 ${formData.accommodationPreference === option.value ? 'text-c-black/60' : 'text-c-dim'}`}>{option.avail}</span>
                           )}
                         </div>
                       </label>
                     ))}
                   </div>
 
-                  {formData.accommodationPreference === 'castle' && (
-                    <p className="text-c-gold text-xs mt-3">
-                      Sleeping in the castle requires a minimum contribution of &euro;90 &mdash; this helps cover the extra costs of the venue. Spots are first come, first served.
-                    </p>
-                  )}
                 </div>
 
                 <div className="border-t border-c-border pt-6">
@@ -435,63 +426,54 @@ export default function RSVPPage() {
                   </div>
 
                   {formData.transportMode === 'car' && (
-                    <p className="text-c-dim text-xs mt-3">
-                      ~1.5h from Berlin (A2), ~4.5h from Munich, ~4h from Frankfurt. Parking on the castle grounds. If you have space, consider offering a ride!
-                    </p>
+                    <p className="text-c-dim text-xs mt-3">~1.5h from Berlin (A2), ~4.5h from Munich, ~4h from Frankfurt. Parking on the castle grounds. If you have space, consider offering a ride!</p>
                   )}
-
                   {formData.transportMode === 'train' && (
                     <>
-                      <p className="text-c-dim text-xs mt-3">
-                        Nearest ICE station: Magdeburg Hbf (~1.5h from Berlin, ~3.5h from Frankfurt). From there ~20 min to Gommern by regional train.
-                      </p>
+                      <p className="text-c-dim text-xs mt-3">Nearest ICE station: Magdeburg Hbf (~1.5h from Berlin, ~3.5h from Frankfurt). From there ~20 min to Gommern by regional train.</p>
                       <label className="flex items-center gap-3 cursor-pointer mt-3 bg-c-surface border border-c-border p-3 min-h-[48px]">
                         <input type="checkbox" checked={formData.needsShuttle} onChange={(e) => setFormData({ ...formData, needsShuttle: e.target.checked })} className="w-4 h-4 accent-c-gold" />
                         <span className="text-c-muted text-sm">I&apos;d need a shuttle from the station</span>
                       </label>
                     </>
                   )}
-
                   {formData.transportMode === 'carpool' && (
-                    <p className="text-c-dim text-xs mt-3">
-                      We&apos;ll help connect drivers and riders closer to the date. Just pick this and we&apos;ll sort it out.
-                    </p>
+                    <p className="text-c-dim text-xs mt-3">We&apos;ll help connect drivers and riders closer to the date. Just pick this and we&apos;ll sort it out.</p>
                   )}
-
                   {formData.transportMode === 'unsure' && (
-                    <p className="text-c-dim text-xs mt-3">
-                      No worries — you can let us know later. Check the venue page for directions when you&apos;re ready.
-                    </p>
+                    <p className="text-c-dim text-xs mt-3">No worries — you can let us know later. Check the venue page for directions when you&apos;re ready.</p>
                   )}
                 </div>
               </div>
-            )}
+              )
+            })()}
 
-            {/* Step 4: Contribution */}
-            {step === 4 && (() => {
+            {/* Step 5: Contribution */}
+            {step === 5 && (() => {
               const wantsCastle = formData.accommodationPreference === 'castle'
-              const minAmount = wantsCastle ? 90 : 20
-              const sliderMin = wantsCastle ? 90 : 20
-              const sliderRange = 200 - sliderMin
+              const sliderMin = wantsCastle ? 90 : 50
+              const sliderMax = 200
+              const sliderRange = sliderMax - sliderMin
+              const isCustom = customAmount || formData.contribution > sliderMax
 
               return (
                 <div className="flex-1">
                   <h2 className="text-xl font-semibold text-c-white mb-1 tracking-tight">Solidarity Contribution</h2>
-                  <p className="text-c-dim text-sm mb-8">Covers venue, food, drinks, music, and the pool</p>
+                  <p className="text-c-dim text-sm mb-8">We don&apos;t want gifts — your contribution to the weekend is the best present we could ask for</p>
 
                   <div className="bg-c-surface border border-c-border p-5 mb-8">
                     {wantsCastle ? (
                       <p className="text-c-muted text-sm">
-                        Since you&apos;d like to sleep in the castle, the minimum contribution
-                        is <span className="text-c-gold font-medium">&euro;90</span>. This helps
-                        cover the extra venue costs. Of course, more is always welcome &mdash;
-                        it helps make the weekend accessible for everyone.
+                        Castle beds are <span className="text-c-gold font-medium">&euro;90 per person</span>.
+                        Mostly shared rooms, some doubles — we&apos;ll do our best to
+                        fit everyone&apos;s needs. The venue is the biggest
+                        cost of the weekend, so this is about covering it together as a group.
                       </p>
                     ) : (
                       <p className="text-c-muted text-sm">
                         We&apos;re suggesting around &euro;90 per person. If you can do more,
                         it helps someone else do less. If that&apos;s a stretch, pay what
-                        works &mdash; no questions asked.
+                        works — no questions asked.
                       </p>
                     )}
                   </div>
@@ -499,36 +481,74 @@ export default function RSVPPage() {
                   <div className="mb-8">
                     <div className="flex justify-between items-end mb-4">
                       <label className="text-c-white font-medium text-sm">Amount</label>
-                      <span className="text-4xl font-serif font-bold text-c-gold tabular-nums">&euro;{formData.contribution}</span>
+                      {isCustom ? (
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-c-gold font-serif text-2xl">&euro;</span>
+                          <input
+                            type="number"
+                            min={sliderMin}
+                            value={formData.contribution}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value) || sliderMin
+                              setFormData({ ...formData, contribution: Math.max(sliderMin, val) })
+                            }}
+                            className="w-24 text-4xl font-serif font-bold text-c-gold tabular-nums bg-transparent border-b border-c-gold/40 focus:outline-none focus:border-c-gold text-right"
+                          />
+                        </div>
+                      ) : (
+                        <span className="text-4xl font-serif font-bold text-c-gold tabular-nums">&euro;{formData.contribution}</span>
+                      )}
                     </div>
-
                     <input
-                      type="range" min={sliderMin} max="200" step="10"
-                      value={formData.contribution}
-                      onChange={(e) => setFormData({ ...formData, contribution: parseInt(e.target.value) })}
+                      type="range" min={sliderMin} max={sliderMax} step="10"
+                      value={Math.min(formData.contribution, sliderMax)}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value)
+                        if (val >= sliderMax) {
+                          setCustomAmount(true)
+                          setFormData({ ...formData, contribution: val })
+                        } else {
+                          setCustomAmount(false)
+                          setFormData({ ...formData, contribution: val })
+                        }
+                      }}
                       className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
                       aria-label="Contribution amount"
-                      style={{ background: `linear-gradient(to right, #C9A84C 0%, #C9A84C ${((formData.contribution - sliderMin) / sliderRange) * 100}%, rgba(255,255,255,0.08) ${((formData.contribution - sliderMin) / sliderRange) * 100}%, rgba(255,255,255,0.08) 100%)` }}
+                      style={{ background: `linear-gradient(to right, #C9A84C 0%, #C9A84C ${((Math.min(formData.contribution, sliderMax) - sliderMin) / sliderRange) * 100}%, rgba(255,255,255,0.08) ${((Math.min(formData.contribution, sliderMax) - sliderMin) / sliderRange) * 100}%, rgba(255,255,255,0.08) 100%)` }}
                     />
                     <div className="flex justify-between text-c-dim text-xs mt-2 font-mono">
                       <span>&euro;{sliderMin}</span>
                       <span>&euro;90 suggested</span>
-                      <span>&euro;200+</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (isCustom) {
+                            setCustomAmount(false)
+                            setFormData({ ...formData, contribution: sliderMax })
+                          } else {
+                            setCustomAmount(true)
+                            setFormData({ ...formData, contribution: sliderMax + 10 })
+                          }
+                        }}
+                        className="text-c-gold hover:text-c-gold-light transition-colors"
+                      >
+                        {isCustom ? '\u2190 back to slider' : '\u20AC200+'}
+                      </button>
                     </div>
                   </div>
 
-                  {formData.contribution >= 120 && (
-                    <p className="text-c-gold text-sm text-center">Legend. This helps make the weekend accessible for everyone.</p>
+                  {formData.contribution >= 150 && (
+                    <p className="text-c-gold text-sm text-center">Legend. This helps make the weekend possible for everyone.</p>
                   )}
                   {!wantsCastle && formData.contribution < 60 && (
-                    <p className="text-c-muted text-sm text-center">No worries &mdash; glad you&apos;re coming.</p>
+                    <p className="text-c-muted text-sm text-center">No worries — glad you&apos;re coming.</p>
                   )}
                 </div>
               )
             })()}
 
-            {/* Step 5: Contact */}
-            {step === 5 && (
+            {/* Step 6: Contact & Details */}
+            {step === 6 && (
               <div className="flex-1">
                 <h2 className="text-xl font-semibold text-c-white mb-1 tracking-tight">Almost there</h2>
                 <p className="text-c-dim text-sm mb-8">So we can stay in touch</p>
@@ -551,18 +571,6 @@ export default function RSVPPage() {
                       />
                     </div>
                   ))}
-
-                  <div>
-                    <label className="block text-c-white font-medium text-sm mb-2">Who invited you? *</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {['Georg', 'Cari', 'Peter'].map((host) => (
-                        <label key={host} className={`text-center py-3 transition-all font-medium text-sm min-h-[48px] flex items-center justify-center ${optionClass(formData.invitedBy === host)}`}>
-                          <input type="radio" name="invitedBy" value={host} checked={formData.invitedBy === host} onChange={(e) => setFormData({ ...formData, invitedBy: e.target.value })} className="sr-only" />
-                          {host}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
 
                   <div>
                     <label className="block text-c-white font-medium text-sm mb-2">Allergies or dietary notes</label>
@@ -594,7 +602,6 @@ export default function RSVPPage() {
                         <span className="text-c-dim text-xs">Bar, kitchen, setup — whatever&apos;s needed.</span>
                       </div>
                     </label>
-
                     {formData.willingToHelp && (
                       <input
                         type="text" value={formData.skills}
@@ -618,9 +625,7 @@ export default function RSVPPage() {
             {/* Navigation */}
             <div className="flex justify-between items-center mt-10 pt-6 border-t border-c-border">
               {currentStepIndex > 0 ? (
-                <button type="button" onClick={goBack} className="text-c-muted font-medium text-sm hover:text-c-white transition-colors min-h-[48px] px-2">
-                  Back
-                </button>
+                <button type="button" onClick={goBack} className="text-c-muted font-medium text-sm hover:text-c-white transition-colors min-h-[48px] px-2">Back</button>
               ) : <div />}
 
               {currentStepIndex < totalSteps - 1 ? (

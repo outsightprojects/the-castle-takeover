@@ -45,7 +45,7 @@ export default function VenuePage() {
 
       {/* Castle Gallery */}
       <section className="px-6 md:px-8 pb-16 max-w-6xl mx-auto">
-        {/* Top row — large hero + portrait */}
+        {/* Row 1 — hero exterior + disco ball */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
           <div className="relative aspect-[16/10] md:col-span-2 overflow-hidden">
             <Image
@@ -59,8 +59,8 @@ export default function VenuePage() {
           </div>
           <div className="relative aspect-[3/4] overflow-hidden">
             <Image
-              src="/images/castle-staircase.jpeg"
-              alt="Wrought-iron staircase with sunlight on stone floors"
+              src="/images/castle-discoball.jpeg"
+              alt="Disco ball hanging in front of baroque archway"
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 33vw"
@@ -68,7 +68,7 @@ export default function VenuePage() {
           </div>
         </div>
 
-        {/* Middle row — three equal */}
+        {/* Row 2 — three interiors */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-2">
           <div className="relative aspect-[4/3] overflow-hidden">
             <Image
@@ -81,8 +81,8 @@ export default function VenuePage() {
           </div>
           <div className="relative aspect-[4/3] overflow-hidden">
             <Image
-              src="/images/castle-steps.jpeg"
-              alt="Garden steps leading to castle entrance"
+              src="/images/castle-staircase.jpeg"
+              alt="Wrought-iron staircase with sunlight on stone floors"
               fill
               className="object-cover"
               sizes="(max-width: 768px) 50vw, 33vw"
@@ -99,7 +99,51 @@ export default function VenuePage() {
           </div>
         </div>
 
-        {/* Bottom — full-width front approach */}
+        {/* Row 3 — bedroom + outdoor dining */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+          <div className="relative aspect-[4/3] overflow-hidden">
+            <Image
+              src="/images/castle-bedroom.jpeg"
+              alt="Castle bedroom with arched window and weathered blue walls"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          </div>
+          <div className="relative aspect-[4/3] overflow-hidden">
+            <Image
+              src="/images/castle-dining.jpeg"
+              alt="Outdoor dining table set in the castle courtyard"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          </div>
+        </div>
+
+        {/* Row 4 — garden steps + dinner with facade */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
+          <div className="relative aspect-[3/4] overflow-hidden">
+            <Image
+              src="/images/castle-steps.jpeg"
+              alt="Garden steps leading to castle entrance"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 33vw"
+            />
+          </div>
+          <div className="relative aspect-[3/4] md:col-span-2 overflow-hidden">
+            <Image
+              src="/images/castle-dinner.jpeg"
+              alt="Dinner table with castle facade in the background"
+              fill
+              className="object-cover object-top"
+              sizes="(max-width: 768px) 100vw, 66vw"
+            />
+          </div>
+        </div>
+
+        {/* Row 5 — full-width front approach */}
         <div className="relative aspect-[21/9] overflow-hidden">
           <Image
             src="/images/castle-front.jpeg"
@@ -285,7 +329,7 @@ export default function VenuePage() {
             {
               icon: BedDouble,
               title: 'In the Castle',
-              desc: 'Around 90 beds in shared rooms with character. Requires a min. \u20AC90 contribution to secure your spot. First come, first served.',
+              desc: 'Around 90 beds \u2014 mostly shared rooms, some doubles. \u20AC90 per bed. We\u2019ll do our best to fit everyone\u2019s needs.',
               tag: '~90 beds',
             },
             {

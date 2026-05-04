@@ -8,7 +8,7 @@ import {
   Music,
   UtensilsCrossed,
   Sparkles,
-  Waves,
+  TreePine,
   ChevronDown,
 } from 'lucide-react'
 
@@ -65,7 +65,7 @@ export default function AboutPage() {
             </p>
             <p>
               No strangers. No awkward networking. Just your people in a
-              castle with a pool.
+              castle by a lake.
             </p>
           </div>
           <div className="mt-8 pt-8 border-t border-c-border">
@@ -111,7 +111,7 @@ export default function AboutPage() {
               subtitle: 'Wind down',
               items: [
                 'Very late brunch. Coffee first.',
-                'Last swim, last walk around the grounds',
+                'Last dip in the lake, last walk around the grounds',
                 'Goodbyes and departure by afternoon',
               ],
             },
@@ -170,17 +170,17 @@ export default function AboutPage() {
               accent: 'gold' as const,
             },
             {
-              icon: Waves,
-              title: 'The pool',
-              desc: 'On the castle grounds. Towels provided. DJ set Saturday afternoon.',
-              accent: 'aqua' as const,
+              icon: TreePine,
+              title: 'Lake & sauna',
+              desc: 'Swim in the lake next to the castle. Warm up in the sauna. Towels provided.',
+              accent: 'gold' as const,
             },
           ].map((item) => (
             <div
               key={item.title}
-              className={`p-6 md:p-8 text-center ${item.accent === 'aqua' ? 'bg-gradient-to-br from-c-pool-deep to-c-surface' : 'bg-c-surface'}`}
+              className="p-6 md:p-8 text-center bg-c-surface"
             >
-              <item.icon className={`mx-auto mb-4 ${item.accent === 'aqua' ? 'text-c-aqua' : 'text-c-gold'}`} size={22} strokeWidth={1.5} />
+              <item.icon className="mx-auto mb-4 text-c-gold" size={22} strokeWidth={1.5} />
               <h3 className="text-c-white font-semibold mb-2">{item.title}</h3>
               <p className="text-c-muted text-sm leading-relaxed">{item.desc}</p>
             </div>
@@ -199,7 +199,7 @@ export default function AboutPage() {
         <div>
           <FAQItem
             question="How much does it cost?"
-            answer="We're asking for a solidarity contribution of around &euro;90. That covers food, drinks, music, the pool, and the venue. If you want to sleep in the castle, &euro;90 is the minimum to secure your bed. Staying elsewhere? Pay what works — no one's checking, no one's judging. Can you do more? Amazing, it helps others."
+            answer="We're asking for a solidarity contribution of around &euro;90. That covers food, drinks, music, the sauna, and the venue. Castle beds are &euro;90 per person — mostly shared rooms, some doubles. We'll do our best to fit everyone's needs. The venue is the biggest expense, so this is about covering it together. Staying elsewhere? Pay what you can — no questions asked. Can you do more? Amazing, it helps others."
           />
           <FAQItem
             question="Can I bring someone?"
@@ -211,7 +211,7 @@ export default function AboutPage() {
           />
           <FAQItem
             question="What should I bring?"
-            answer="Comfortable clothes, layers for evenings, swimwear (obviously), a torch for late-night castle exploring. Good energy."
+            answer="Comfortable clothes, layers for evenings, swimwear for the lake, a torch for late-night castle exploring. Good energy."
           />
           <FAQItem
             question="Is there wifi?"
@@ -223,7 +223,7 @@ export default function AboutPage() {
           />
           <FAQItem
             question="Where do I sleep?"
-            answer="About 90 beds in the castle (requires min. &euro;90 contribution to secure your spot), 70 more in a nearby village, plus camping on the grounds. Or book your own hotel. You pick in the RSVP."
+            answer="About 90 beds in the castle (&euro;90 per bed — mostly shared rooms, some doubles, we'll fit everyone's needs), 70 more in a nearby village, plus camping on the grounds. Or book your own thing. You pick in the RSVP."
           />
         </div>
       </section>

@@ -1,56 +1,98 @@
-import { Client } from '@notionhq/client'
 import { NextResponse } from 'next/server'
 
-const notion = new Client({ auth: process.env.NOTION_API_KEY })
-const DATABASE_ID = process.env.NOTION_GUEST_DS_ID || process.env.NOTION_GUEST_DB_ID || process.env.NOTION_CONFIG_DS_ID!
+const NOTION_API_KEY = process.env.NOTION_API_KEY!
+const GUEST_DS_ID = process.env.NOTION_GUEST_DS_ID!
+const CONFIG_DS_ID = process.env.NOTION_CONFIG_DS_ID!
 
-const TOTAL_CASTLE_BEDS = 90
-const TOTAL_VILLAGE_BEDS = 70
+const HOSTS = ['Georg', 'Cari', 'Peter'] as const
+
+async function notionQuery(dsId: string, filter?: Record<string, unknown>) {
+  const res = await fetch(`https://api.notion.com/v1/data_sources/${dsId}/query`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${NOTION_API_KEY}`,
+      'Content-Type': 'application/json',
+      'Notion-Version': '2025-09-03',
+    },
+    body: JSON.stringify(filter ? { filter } : {}),
+  })
+  if (!res.ok) return { results: [] }
+  return res.json()
+}
 
 export async function GET() {
   try {
-    const response = await (notion as any).dataSources.query({
-      data_source_id: DATABASE_ID,
-      filter: {
-        and: [
-          {
-            property: 'Status',
-            select: { equals: 'Zugesagt' },
-          },
-          {
-            property: 'Übernachtung',
-            select: { equals: 'Ja' },
-          },
-        ],
-      },
+    // 1. Read per-host allocations from config DB
+    const configData = await notionQuery(CONFIG_DS_ID)
+    const allocations: Record<string, number> = { Georg: 30, Cari: 30, Peter: 30 }
+    let totalVillageBeds = 70
+
+    for (const page of configData.results) {
+      const name = page.properties?.Name?.title?.[0]?.plain_text as string
+      const wert = page.properties?.Wert?.number as number
+      if (name === 'Betten Georg') allocations.Georg = wert
+      if (name === 'Betten Cari') allocations.Cari = wert
+      if (name === 'Betten Peter') allocations.Peter = wert
+      if (name === 'Dorf Betten') totalVillageBeds = wert
+    }
+
+    const totalCastleBeds = allocations.Georg + allocations.Cari + allocations.Peter
+
+    // 2. Count confirmed castle guests per host
+    // Only Zugesagt and Zugesagt + Bezahlt count against bed availability
+    // Vielleicht guests do NOT block beds
+    const guestData = await notionQuery(GUEST_DS_ID, {
+      and: [
+        {
+          or: [
+            { property: 'Status', select: { equals: 'Zugesagt' } },
+            { property: 'Status', select: { equals: 'Zugesagt + Bezahlt' } },
+          ],
+        },
+        { property: 'Übernachtung', select: { equals: 'Ja' } },
+      ],
     })
 
-    let castleTaken = 0
-    let villageTaken = 0
+    const taken: Record<string, { castle: number; village: number }> = {
+      Georg: { castle: 0, village: 0 },
+      Cari: { castle: 0, village: 0 },
+      Peter: { castle: 0, village: 0 },
+    }
 
-    for (const page of response.results) {
-      if (!('properties' in page)) continue
+    for (const page of guestData.results) {
       const props = page.properties as Record<string, any>
-      const unterkunft = props['Unterkunft']?.select?.name
+      const host = props.Host?.select?.name as string
+      const unterkunft = props.Unterkunft?.select?.name as string
 
-      if (unterkunft === 'Schloss') {
-        castleTaken++
-      } else if (unterkunft === 'Dorf') {
-        villageTaken++
+      if (!taken[host]) continue
+      if (unterkunft === 'Schloss') taken[host].castle++
+      else if (unterkunft === 'Dorf') taken[host].village++
+    }
+
+    const totalCastleTaken = taken.Georg.castle + taken.Cari.castle + taken.Peter.castle
+    const totalVillageTaken = taken.Georg.village + taken.Cari.village + taken.Peter.village
+
+    const perHost: Record<string, { total: number; taken: number; available: number }> = {}
+    for (const host of HOSTS) {
+      perHost[host] = {
+        total: allocations[host],
+        taken: taken[host].castle,
+        available: allocations[host] - taken[host].castle,
       }
     }
 
     return NextResponse.json({
       castle: {
-        total: TOTAL_CASTLE_BEDS,
-        taken: castleTaken,
-        available: TOTAL_CASTLE_BEDS - castleTaken,
+        total: totalCastleBeds,
+        taken: totalCastleTaken,
+        available: totalCastleBeds - totalCastleTaken,
       },
       village: {
-        total: TOTAL_VILLAGE_BEDS,
-        taken: villageTaken,
-        available: TOTAL_VILLAGE_BEDS - villageTaken,
+        total: totalVillageBeds,
+        taken: totalVillageTaken,
+        available: totalVillageBeds - totalVillageTaken,
       },
+      perHost,
     }, {
       headers: {
         'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
@@ -59,8 +101,13 @@ export async function GET() {
   } catch (error) {
     console.error('Beds query error:', error)
     return NextResponse.json({
-      castle: { total: TOTAL_CASTLE_BEDS, taken: 0, available: TOTAL_CASTLE_BEDS },
-      village: { total: TOTAL_VILLAGE_BEDS, taken: 0, available: TOTAL_VILLAGE_BEDS },
+      castle: { total: 90, taken: 0, available: 90 },
+      village: { total: 70, taken: 0, available: 70 },
+      perHost: {
+        Georg: { total: 30, taken: 0, available: 30 },
+        Cari: { total: 30, taken: 0, available: 30 },
+        Peter: { total: 30, taken: 0, available: 30 },
+      },
     })
   }
 }

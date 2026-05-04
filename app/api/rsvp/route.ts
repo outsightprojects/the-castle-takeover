@@ -123,6 +123,13 @@ export async function POST(request: NextRequest) {
     }
     properties['Ankunftstag'] = { select: { name: arrivalMap[arrivalDay] || 'Noch unklar' } }
 
+    // Nachfassen — 7 days from now if confirmed + castle bed
+    if (attendance === 'yes' && accommodationPreference === 'castle') {
+      const followUp = new Date()
+      followUp.setDate(followUp.getDate() + 7)
+      properties['Nachfassen'] = { date: { start: followUp.toISOString().split('T')[0] } }
+    }
+
     // Notes — freetext only, plus camping/self info that has no dedicated field
     const noteParts: string[] = []
     if (accommodationPreference === 'camping') noteParts.push('Unterkunft: Camping')
