@@ -377,13 +377,14 @@ export default function RSVPPage() {
                           ? `Castle beds are currently full`
                           : isLikely
                           ? 'Mostly shared rooms, some doubles \u2014 once you\u2019re sure, let us know'
-                          : 'Mostly shared rooms, some doubles \u2014 \u20AC90 per bed',
+                          : 'Mostly shared rooms, some doubles',
+                        price: castleFull ? null : '\u20AC90 incl. bed',
                         avail: castleFull ? null : `${hostCastleAvailable}/${hostCastleTotal}`,
                         disabled: castleFull,
                       },
-                      { value: 'village', label: 'Village', desc: '5 min walk, we help coordinate', avail: `${villageBedsRemaining}/${totalVillageBeds}`, disabled: false },
-                      { value: 'camping', label: 'Camping', desc: 'Tent or camper on the grounds', avail: null, disabled: false },
-                      { value: 'self', label: 'Own arrangement', desc: 'Hotel, Airbnb, etc.', avail: null, disabled: false },
+                      { value: 'village', label: 'Village', desc: '5 min walk, we help coordinate', price: '\u20AC50+ contribution', avail: `${villageBedsRemaining}/${totalVillageBeds}`, disabled: false },
+                      { value: 'camping', label: 'Camping', desc: 'Tent or camper on the grounds', price: '\u20AC50+ contribution', avail: null, disabled: false },
+                      { value: 'self', label: 'Own arrangement', desc: 'Hotel, Airbnb, etc.', price: '\u20AC50+ contribution', avail: null, disabled: false },
                     ].map((option) => (
                       <label key={option.value} className={`block p-4 transition-all min-h-[48px] ${optionClass(formData.accommodationPreference === option.value, option.disabled)}`}>
                         <input type="radio" name="accommodationPreference" value={option.value} checked={formData.accommodationPreference === option.value} disabled={option.disabled} onChange={(e) => {
@@ -391,16 +392,28 @@ export default function RSVPPage() {
                           setFormData({
                             ...formData,
                             accommodationPreference: val,
-                            contribution: val === 'castle' && formData.contribution < 90 ? 90 : formData.contribution,
+                            // Snap contribution to a sensible anchor when switching:
+                            //   - castle: ensure \u2265 \u20AC90 (bed cost floor)
+                            //   - non-castle from default \u20AC90: drop to \u20AC70 soft anchor
+                            //   - any user-tweaked value in between: leave alone
+                            contribution:
+                              val === 'castle' && formData.contribution < 90
+                                ? 90
+                                : val !== 'castle' && formData.contribution === 90
+                                ? 70
+                                : formData.contribution,
                           })
                         }} className="sr-only" />
-                        <div className="flex justify-between items-center">
-                          <div>
+                        <div className="flex justify-between items-start gap-3">
+                          <div className="min-w-0">
                             <span className="font-medium text-sm block">{option.label}</span>
                             <span className={`text-xs ${formData.accommodationPreference === option.value ? 'text-c-black/60' : 'text-c-dim'}`}>{option.desc}</span>
+                            {option.price && (
+                              <span className={`font-mono text-[11px] tracking-wide block mt-1 ${formData.accommodationPreference === option.value ? 'text-c-black/50' : 'text-c-dim'}`}>{option.price}</span>
+                            )}
                           </div>
                           {option.avail && (
-                            <span className={`font-mono text-xs shrink-0 ml-3 ${formData.accommodationPreference === option.value ? 'text-c-black/60' : 'text-c-dim'}`}>{option.avail}</span>
+                            <span className={`font-mono text-xs shrink-0 mt-0.5 ${formData.accommodationPreference === option.value ? 'text-c-black/60' : 'text-c-dim'}`}>{option.avail}</span>
                           )}
                         </div>
                       </label>
@@ -471,9 +484,9 @@ export default function RSVPPage() {
                       </p>
                     ) : (
                       <p className="text-c-muted text-sm">
-                        We&apos;re suggesting around &euro;90 per person. If you can do more,
-                        it helps someone else do less. If that&apos;s a stretch, pay what
-                        works — no questions asked.
+                        &euro;50 minimum, &euro;90 suggested. Even without a castle bed,
+                        this covers your share of the venue, food, drinks, music,
+                        and the sauna. If it&apos;s a stretch, pay what works.
                       </p>
                     )}
                   </div>
