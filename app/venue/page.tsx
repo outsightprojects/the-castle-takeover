@@ -181,8 +181,9 @@ export default function VenuePage() {
               The traces of time give the place its unique atmosphere:
               ornate stucco ceilings, sprawling gardens, and rooms full of
               character. Courtyards for afternoon drinks, a grand hall for
-              dinner, cellar rooms for late-night music, and views across
-              the countryside. The whole place is ours for the weekend.
+              dinner, cellar rooms for late-night music, a lake at the
+              doorstep, a sauna to warm up in, and views across the
+              countryside. The whole place is ours for the weekend.
             </p>
           </div>
 
