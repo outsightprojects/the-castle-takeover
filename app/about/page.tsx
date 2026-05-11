@@ -199,7 +199,7 @@ export default function AboutPage() {
         <div>
           <FAQItem
             question="How much does it cost?"
-            answer="We're asking for a solidarity contribution of around &euro;90. That covers food, drinks, music, the sauna, and the venue. Castle beds are &euro;90 per person — mostly shared rooms, some doubles. We'll do our best to fit everyone's needs. The venue is the biggest expense, so this is about covering it together. Staying elsewhere? &euro;50+ helps cover your share of the venue, food, drinks, and music — pay what works. Can you do more? Amazing, it helps others."
+            answer="We're asking for a solidarity contribution to cover food, drinks, music, the sauna, and the venue. Castle beds are &euro;150 per person — mostly shared rooms, some doubles. We'll do our best to fit everyone's needs. The venue is the biggest expense, so this is about covering it together. Staying elsewhere? &euro;120 is the suggested amount (&euro;50 minimum) — covers your share of the venue, food, drinks, and music. Pay what works. Can you do more? Amazing, it helps others."
           />
           <FAQItem
             question="Can I bring someone?"
@@ -223,7 +223,7 @@ export default function AboutPage() {
           />
           <FAQItem
             question="Where do I sleep?"
-            answer="About 90 beds in the castle (&euro;90 per bed — mostly shared rooms, some doubles, we'll fit everyone's needs), village or hotel stays nearby (&euro;50+ contribution, self-arranged), or camping on the grounds. You pick in the RSVP."
+            answer="About 90 beds in the castle (&euro;150 per bed — mostly shared rooms, some doubles, we'll fit everyone's needs), village or hotel stays nearby (&euro;120 suggested, &euro;50 minimum, self-arranged), or camping on the grounds. You pick in the RSVP."
           />
         </div>
       </section>

@@ -31,7 +31,7 @@ export default function RSVPPage() {
     accommodationPreference: '',
     transportMode: '',
     needsShuttle: false,
-    contribution: 90,
+    contribution: 150,
     name: '',
     email: '',
     phone: '',
@@ -106,7 +106,7 @@ export default function RSVPPage() {
       case 2: return formData.invitedBy !== ''
       case 3: return formData.arrivalDay !== '' && formData.stayDuration !== ''
       case 4: return formData.accommodationPreference !== ''
-      case 5: return formData.accommodationPreference === 'castle' ? formData.contribution >= 90 : formData.contribution >= 50
+      case 5: return formData.accommodationPreference === 'castle' ? formData.contribution >= 150 : formData.contribution >= 50
       case 6: return formData.name !== '' && formData.email !== ''
       default: return false
     }
@@ -373,7 +373,7 @@ export default function RSVPPage() {
                           : isLikely
                           ? 'Mostly shared rooms, some doubles \u2014 once you\u2019re sure, let us know'
                           : 'Mostly shared rooms, some doubles',
-                        price: castleFull ? null : '\u20AC90 incl. bed',
+                        price: castleFull ? null : '\u20AC150 incl. bed',
                         avail: castleFull ? null : `${hostCastleAvailable}/${hostCastleTotal}`,
                         disabled: castleFull,
                       },
@@ -387,14 +387,14 @@ export default function RSVPPage() {
                             ...formData,
                             accommodationPreference: val,
                             // Snap contribution to a sensible anchor when switching:
-                            //   - castle: ensure \u2265 \u20AC90 (bed cost floor)
-                            //   - non-castle from default \u20AC90: drop to \u20AC70 soft anchor
+                            //   - castle: ensure \u2265 \u20AC150 (bed cost floor)
+                            //   - non-castle from default \u20AC150: drop to \u20AC120 soft anchor
                             //   - any user-tweaked value in between: leave alone
                             contribution:
-                              val === 'castle' && formData.contribution < 90
-                                ? 90
-                                : val !== 'castle' && formData.contribution === 90
-                                ? 70
+                              val === 'castle' && formData.contribution < 150
+                                ? 150
+                                : val !== 'castle' && formData.contribution === 150
+                                ? 120
                                 : formData.contribution,
                           })
                         }} className="sr-only" />
@@ -458,9 +458,10 @@ export default function RSVPPage() {
             {/* Step 5: Contribution */}
             {step === 5 && (() => {
               const wantsCastle = formData.accommodationPreference === 'castle'
-              const sliderMin = wantsCastle ? 90 : 50
-              const sliderMax = 200
+              const sliderMin = wantsCastle ? 150 : 50
+              const sliderMax = 300
               const sliderRange = sliderMax - sliderMin
+              const suggestedAmount = wantsCastle ? 150 : 120
               const isCustom = customAmount || formData.contribution > sliderMax
 
               return (
@@ -471,14 +472,14 @@ export default function RSVPPage() {
                   <div className="bg-c-surface border border-c-border p-5 mb-8">
                     {wantsCastle ? (
                       <p className="text-c-muted text-sm">
-                        Castle beds are <span className="text-c-gold font-medium">&euro;90 per person</span>.
+                        Castle beds are <span className="text-c-gold font-medium">&euro;150 per person</span>.
                         Mostly shared rooms, some doubles — we&apos;ll do our best to
                         fit everyone&apos;s needs. The venue is the biggest
                         cost of the weekend, so this is about covering it together as a group.
                       </p>
                     ) : (
                       <p className="text-c-muted text-sm">
-                        &euro;50 minimum, &euro;90 suggested. Even without a castle bed,
+                        &euro;50 minimum, &euro;120 suggested. Even without a castle bed,
                         this covers your share of the venue, food, drinks, music,
                         and the sauna. If it&apos;s a stretch, pay what works.
                       </p>
@@ -525,7 +526,7 @@ export default function RSVPPage() {
                     />
                     <div className="flex justify-between text-c-dim text-xs mt-2 font-mono">
                       <span>&euro;{sliderMin}</span>
-                      <span>&euro;90 suggested</span>
+                      <span>&euro;{suggestedAmount} suggested</span>
                       <button
                         type="button"
                         onClick={() => {
@@ -539,12 +540,12 @@ export default function RSVPPage() {
                         }}
                         className="text-c-gold hover:text-c-gold-light transition-colors"
                       >
-                        {isCustom ? '\u2190 back to slider' : '\u20AC200+'}
+                        {isCustom ? '\u2190 back to slider' : '\u20AC300+'}
                       </button>
                     </div>
                   </div>
 
-                  {formData.contribution >= 150 && (
+                  {formData.contribution >= 220 && (
                     <p className="text-c-gold text-sm text-center">Legend. This helps make the weekend possible for everyone.</p>
                   )}
                   {!wantsCastle && formData.contribution < 60 && (

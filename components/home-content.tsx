@@ -231,14 +231,14 @@ export function HomeContent({ guestName }: { guestName?: string }) {
           The practical bit
         </h2>
         <p className="text-c-muted leading-relaxed text-[15px] mb-6">
-          We&rsquo;re asking everyone for a solidarity contribution of around
-          &euro;90 to cover food, drinks, music, the venue, and the sauna.
+          We&rsquo;re asking for a solidarity contribution to cover food,
+          drinks, music, the venue, and the sauna. Castle beds are
+          &euro;150 per person &mdash; mostly shared rooms, some doubles,
+          and we&rsquo;ll do our best to fit everyone&rsquo;s needs.
+          Staying elsewhere? &euro;120 suggested (&euro;50 minimum).
           If you can do more, it helps someone else do less. If it&rsquo;s
           a stretch, pay what you can &mdash; zero guilt, zero questions.
-          One thing: castle beds are &euro;90 per person — mostly shared
-          rooms, some doubles, and we&rsquo;ll do our best to fit
-          everyone&rsquo;s needs. The venue is the biggest cost and
-          we need to cover it together.
+          The venue is the biggest cost and we need to cover it together.
         </p>
         <p className="text-c-muted leading-relaxed text-[15px]">
           RSVP takes about 2 minutes. You pick your arrival day,
