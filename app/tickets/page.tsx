@@ -560,8 +560,10 @@ export default function RSVPPage() {
                           : null
                         : null
 
-                      const priceText =
-                        price === 0
+                      const priceText: string | null =
+                        option.key === 'self'
+                          ? null
+                          : price === 0
                           ? 'No bed cost'
                           : `€${price} per bed · whole weekend`
                       const selected = formData.accommodationPreference === option.key
@@ -595,13 +597,15 @@ export default function RSVPPage() {
                               >
                                 {isFull ? 'Currently full' : option.desc}
                               </span>
-                              <span
-                                className={`font-mono text-[11px] tracking-wide block mt-1 ${
-                                  selected ? 'text-c-black/50' : 'text-c-dim'
-                                }`}
-                              >
-                                {priceText}
-                              </span>
+                              {priceText && (
+                                <span
+                                  className={`font-mono text-[11px] tracking-wide block mt-1 ${
+                                    selected ? 'text-c-black/50' : 'text-c-dim'
+                                  }`}
+                                >
+                                  {priceText}
+                                </span>
+                              )}
                             </div>
                             {availText && (
                               <span
