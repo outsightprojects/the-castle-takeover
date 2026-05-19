@@ -30,6 +30,13 @@ const VENUE_ORDER = [
 // Camping/Self-Provided sind kapazitäts-unbegrenzt
 const UNLIMITED_VENUES = new Set(['Camping', 'Self-Provided'])
 
+// Alias: das Bed-Inventory benutzt teilweise abweichende Venue-Namen.
+// Wir normalisieren beim Einlesen auf die UI-Namen.
+const BED_VENUE_ALIAS: Record<string, string> = {
+  'Deichgraf Elbpension': 'Deichgraf',
+  'Self-Accommodation': 'Self-Provided',
+}
+
 interface VenueStatus {
   name: string
   price: number
@@ -51,8 +58,9 @@ export async function GET() {
       })
       for (const page of bedResp.results) {
         if (!('properties' in page)) continue
-        const venue = (page.properties as any)['Venue']?.select?.name
-        if (!venue) continue
+        const rawVenue = (page.properties as any)['Venue']?.select?.name
+        if (!rawVenue) continue
+        const venue = BED_VENUE_ALIAS[rawVenue] ?? rawVenue
         totals[venue] = (totals[venue] || 0) + 1
       }
       bedCursor = bedResp.has_more ? bedResp.next_cursor : undefined

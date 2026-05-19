@@ -560,7 +560,10 @@ export default function RSVPPage() {
                           : null
                         : null
 
-                      const priceText = price === 0 ? 'No bed cost' : `€${price} bed`
+                      const priceText =
+                        price === 0
+                          ? 'No bed cost'
+                          : `€${price} per bed · whole weekend`
                       const selected = formData.accommodationPreference === option.key
 
                       return (
@@ -719,7 +722,7 @@ export default function RSVPPage() {
                           <p className="text-c-dim text-xs">
                             {computedBedFee === 0
                               ? 'Free'
-                              : '1 bed, 1–2 nights'}
+                              : '1 bed · whole weekend'}
                           </p>
                         </div>
                         <span className="font-serif text-xl text-c-white tabular-nums">
