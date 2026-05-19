@@ -1,98 +1,147 @@
+import { Client } from '@notionhq/client'
 import { NextResponse } from 'next/server'
 
-const NOTION_API_KEY = process.env.NOTION_API_KEY!
+const notion = new Client({ auth: process.env.NOTION_API_KEY })
 const GUEST_DS_ID = process.env.NOTION_GUEST_DS_ID!
-const CONFIG_DS_ID = process.env.NOTION_CONFIG_DS_ID!
+const BED_INVENTORY_DS_ID = process.env.NOTION_BED_INVENTORY_DS_ID!
 
-const HOSTS = ['Georg', 'Cari', 'Peter'] as const
+// Venue-Preise (Quelle: Event Konfiguration in Notion).
+// Hardcoded hier als Fallback und für schnelle Antworten ohne extra Notion-Roundtrip.
+// Wenn ihr Preise ändert: Notion Event Konfig + hier synchron halten.
+const VENUE_PRICES: Record<string, number> = {
+  Castle: 90,
+  'Gelbes Haus': 75,
+  Schlosskrug: 50,
+  Deichgraf: 123,
+  Camping: 0,
+  'Self-Provided': 0,
+}
 
-async function notionQuery(dsId: string, filter?: Record<string, unknown>) {
-  const res = await fetch(`https://api.notion.com/v1/data_sources/${dsId}/query`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${NOTION_API_KEY}`,
-      'Content-Type': 'application/json',
-      'Notion-Version': '2025-09-03',
-    },
-    body: JSON.stringify(filter ? { filter } : {}),
-  })
-  if (!res.ok) return { results: [] }
-  return res.json()
+// Reihenfolge im Frontend
+const VENUE_ORDER = [
+  'Castle',
+  'Gelbes Haus',
+  'Schlosskrug',
+  'Deichgraf',
+  'Camping',
+  'Self-Provided',
+] as const
+
+// Camping/Self-Provided sind kapazitäts-unbegrenzt
+const UNLIMITED_VENUES = new Set(['Camping', 'Self-Provided'])
+
+interface VenueStatus {
+  name: string
+  price: number
+  total: number | null // null = unbegrenzt
+  taken: number
+  available: number | null // null = unbegrenzt
 }
 
 export async function GET() {
   try {
-    // 1. Read per-host castle allocations from config DB
-    // (Village/hotel stays are self-arranged; we don't track capacity for them.)
-    const configData = await notionQuery(CONFIG_DS_ID)
-    const allocations: Record<string, number> = { Georg: 30, Cari: 30, Peter: 30 }
+    // 1) Bed Inventory: wie viele physische Betten existieren pro Venue?
+    const totals: Record<string, number> = {}
+    let bedCursor: string | undefined = undefined
+    do {
+      const bedResp: any = await notion.dataSources.query({
+        data_source_id: BED_INVENTORY_DS_ID,
+        start_cursor: bedCursor,
+        page_size: 100,
+      })
+      for (const page of bedResp.results) {
+        if (!('properties' in page)) continue
+        const venue = (page.properties as any)['Venue']?.select?.name
+        if (!venue) continue
+        totals[venue] = (totals[venue] || 0) + 1
+      }
+      bedCursor = bedResp.has_more ? bedResp.next_cursor : undefined
+    } while (bedCursor)
 
-    for (const page of configData.results) {
-      const name = page.properties?.Name?.title?.[0]?.plain_text as string
-      const wert = page.properties?.Wert?.number as number
-      if (name === 'Betten Georg') allocations.Georg = wert
-      if (name === 'Betten Cari') allocations.Cari = wert
-      if (name === 'Betten Peter') allocations.Peter = wert
-    }
-
-    const totalCastleBeds = allocations.Georg + allocations.Cari + allocations.Peter
-
-    // 2. Count confirmed castle guests per host
-    // Only Zugesagt and Zugesagt + Bezahlt count against bed availability
-    // Vielleicht guests do NOT block beds
-    const guestData = await notionQuery(GUEST_DS_ID, {
-      and: [
-        {
-          or: [
-            { property: 'Status', select: { equals: 'Zugesagt' } },
-            { property: 'Status', select: { equals: 'Zugesagt + Bezahlt' } },
+    // 2) Gästeliste: wie viele Gäste haben welches Venue gewählt (und nicht abgesagt)?
+    const taken: Record<string, number> = {}
+    let guestCursor: string | undefined = undefined
+    do {
+      const guestResp: any = await notion.dataSources.query({
+        data_source_id: GUEST_DS_ID,
+        filter: {
+          and: [
+            { property: 'Status', select: { does_not_equal: 'Abgesagt' } },
+            { property: 'Übernachtung', select: { does_not_equal: 'Nein' } },
           ],
         },
-        { property: 'Übernachtung', select: { equals: 'Ja' } },
-        { property: 'Unterkunft', select: { equals: 'Schloss' } },
-      ],
-    })
-
-    const taken: Record<string, number> = { Georg: 0, Cari: 0, Peter: 0 }
-
-    for (const page of guestData.results) {
-      const props = page.properties as Record<string, any>
-      const host = props.Host?.select?.name as string
-      if (host in taken) taken[host]++
-    }
-
-    const totalCastleTaken = taken.Georg + taken.Cari + taken.Peter
-
-    const perHost: Record<string, { total: number; taken: number; available: number }> = {}
-    for (const host of HOSTS) {
-      perHost[host] = {
-        total: allocations[host],
-        taken: taken[host],
-        available: allocations[host] - taken[host],
+        start_cursor: guestCursor,
+        page_size: 100,
+      })
+      for (const page of guestResp.results) {
+        if (!('properties' in page)) continue
+        const unterkunft = (page.properties as any)['Unterkunft']?.select?.name
+        if (!unterkunft) continue
+        // Legacy-Werte auf neue mappen, damit alte RSVPs mitgezählt werden
+        const normalized =
+          unterkunft === 'Schloss' ? 'Castle' :
+          unterkunft === 'Dorf' ? 'Gelbes Haus' : // Default-Bucket für unspezifisches Dorf
+          unterkunft
+        taken[normalized] = (taken[normalized] || 0) + 1
       }
-    }
+      guestCursor = guestResp.has_more ? guestResp.next_cursor : undefined
+    } while (guestCursor)
 
-    return NextResponse.json({
-      castle: {
-        total: totalCastleBeds,
-        taken: totalCastleTaken,
-        available: totalCastleBeds - totalCastleTaken,
-      },
-      perHost,
-    }, {
-      headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
-      },
+    const venues: VenueStatus[] = VENUE_ORDER.map((name) => {
+      const unlimited = UNLIMITED_VENUES.has(name)
+      const total = unlimited ? null : (totals[name] || 0)
+      const t = taken[name] || 0
+      return {
+        name,
+        price: VENUE_PRICES[name],
+        total,
+        taken: t,
+        available: unlimited ? null : Math.max(0, (total ?? 0) - t),
+      }
     })
+
+    // Backwards-compat-Block für die alte Frontend-Logik (castle/village).
+    // Kann entfernt werden, sobald das neue Frontend live ist.
+    const castle = venues.find((v) => v.name === 'Castle')!
+    const villageTotal =
+      (totals['Gelbes Haus'] || 0) + (totals['Schlosskrug'] || 0) + (totals['Deichgraf'] || 0)
+    const villageTaken =
+      (taken['Gelbes Haus'] || 0) + (taken['Schlosskrug'] || 0) + (taken['Deichgraf'] || 0)
+
+    return NextResponse.json(
+      {
+        venues,
+        castle: {
+          total: castle.total ?? 0,
+          taken: castle.taken,
+          available: castle.available ?? 0,
+        },
+        village: {
+          total: villageTotal,
+          taken: villageTaken,
+          available: Math.max(0, villageTotal - villageTaken),
+        },
+      },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+        },
+      }
+    )
   } catch (error) {
     console.error('Beds query error:', error)
+    // Fallback: Fixwerte, damit die Seite trotzdem rendert
+    const venues: VenueStatus[] = VENUE_ORDER.map((name) => ({
+      name,
+      price: VENUE_PRICES[name],
+      total: UNLIMITED_VENUES.has(name) ? null : 0,
+      taken: 0,
+      available: UNLIMITED_VENUES.has(name) ? null : 0,
+    }))
     return NextResponse.json({
-      castle: { total: 90, taken: 0, available: 90 },
-      perHost: {
-        Georg: { total: 30, taken: 0, available: 30 },
-        Cari: { total: 30, taken: 0, available: 30 },
-        Peter: { total: 30, taken: 0, available: 30 },
-      },
+      venues,
+      castle: { total: 88, taken: 0, available: 88 },
+      village: { total: 15, taken: 0, available: 15 },
     })
   }
 }
