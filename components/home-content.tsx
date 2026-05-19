@@ -13,6 +13,8 @@ import {
   Flame,
   Sun,
   TreePine,
+  Building,
+  UtensilsCrossed,
 } from 'lucide-react'
 
 export function HomeContent({ guestName }: { guestName?: string }) {
@@ -226,31 +228,55 @@ export function HomeContent({ guestName }: { guestName?: string }) {
       {/* ── Contribution note ── */}
       <div className="rule" />
 
-      <section className="px-6 md:px-8 py-16 md:py-24 max-w-2xl mx-auto text-center">
-        <h2 className="font-serif text-3xl md:text-4xl font-bold text-c-white mb-6">
-          The practical bit
-        </h2>
-        <p className="text-c-muted leading-relaxed text-[15px] mb-6">
-          We&rsquo;re asking for a solidarity contribution to cover food,
-          drinks, music, the venue, and the sauna. Castle beds are
-          &euro;150 per person &mdash; mostly shared rooms, some doubles,
-          and we&rsquo;ll do our best to fit everyone&rsquo;s needs.
-          Staying elsewhere? &euro;120 suggested (&euro;50 minimum).
-          If you can do more, it helps someone else do less. If it&rsquo;s
-          a stretch, pay what you can &mdash; zero guilt, zero questions.
-          The venue is the biggest cost and we need to cover it together.
-        </p>
-        <p className="text-c-muted leading-relaxed text-[15px]">
-          RSVP takes about 2 minutes. You pick your arrival day,
-          where you want to sleep, and any dietary notes. That&rsquo;s it.
-        </p>
-        <Link
-          href="/tickets"
-          className="group inline-flex items-center justify-center gap-2 bg-c-gold text-c-black font-semibold px-10 py-4 rounded-none text-sm tracking-widest uppercase hover:bg-c-gold-light active:scale-[0.98] transition-all min-h-[48px] mt-10"
-        >
-          RSVP
-          <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
-        </Link>
+      <section className="px-6 md:px-8 py-16 md:py-24 max-w-3xl mx-auto">
+        <div className="text-center">
+          <h2 className="font-serif text-3xl md:text-4xl font-bold text-c-white mb-6">
+            The practical bit
+          </h2>
+          <p className="text-c-muted leading-relaxed text-[15px] mb-10 max-w-xl mx-auto">
+            Your contribution covers everything for the weekend &mdash; no
+            extras, no add-ons.
+          </p>
+        </div>
+
+        <ul className="space-y-5 mb-12 max-w-xl mx-auto">
+          {[
+            { icon: Building, label: 'Castle rent', detail: 'The whole baroque palace, Friday to Sunday' },
+            { icon: UtensilsCrossed, label: 'All food', detail: 'Provided throughout the weekend' },
+            { icon: Wine, label: 'All drinks', detail: 'Open bar all weekend' },
+            { icon: Music, label: 'Music, DJs, sauna', detail: 'Courtyard sets, cellar parties, towels provided' },
+            { icon: Sparkles, label: 'Cleaning & electricity', detail: 'Running a castle for three days has real costs' },
+          ].map((item) => (
+            <li key={item.label} className="flex items-start gap-4">
+              <item.icon className="text-c-gold shrink-0 mt-0.5" size={20} strokeWidth={1.5} />
+              <div>
+                <p className="text-c-white font-medium text-sm">{item.label}</p>
+                <p className="text-c-muted text-sm">{item.detail}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        <div className="text-center max-w-xl mx-auto">
+          <p className="text-c-muted leading-relaxed text-[15px] mb-6">
+            Castle beds are &euro;150 per person &mdash; mostly shared rooms,
+            some doubles. Staying elsewhere? &euro;120 suggested (&euro;100
+            minimum). If you can do more, it helps someone else do less. If
+            it&rsquo;s a stretch, pay what you can &mdash; zero guilt, zero
+            questions.
+          </p>
+          <p className="text-c-muted leading-relaxed text-[15px]">
+            RSVP takes about 2 minutes. You pick your arrival day,
+            where you want to sleep, and any dietary notes. That&rsquo;s it.
+          </p>
+          <Link
+            href="/tickets"
+            className="group inline-flex items-center justify-center gap-2 bg-c-gold text-c-black font-semibold px-10 py-4 rounded-none text-sm tracking-widest uppercase hover:bg-c-gold-light active:scale-[0.98] transition-all min-h-[48px] mt-10"
+          >
+            RSVP
+            <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+        </div>
       </section>
 
       {/* ── Final CTA ── */}

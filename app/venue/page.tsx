@@ -335,7 +335,7 @@ export default function VenuePage() {
             },
             {
               icon: Home,
-              title: 'Village or hotel',
+              title: 'Self-organized Hotel/Pension nearby',
               desc: 'Houses or hotels ~5 min from castle. Self-arranged — book your own.',
               tag: 'Self-arrange',
             },
