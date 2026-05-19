@@ -47,7 +47,7 @@ const ACCOMMODATION_OPTIONS: Array<{
   desc: string
   hasCapacity: boolean
 }> = [
-  { key: 'castle', apiName: 'Castle', label: 'Castle', desc: 'Inside the castle itself', hasCapacity: true },
+  { key: 'castle', apiName: 'Castle', label: 'Castle', desc: 'Inside the castle — mix of room types', hasCapacity: true },
   { key: 'gelbeshaus', apiName: 'Gelbes Haus', label: 'Gelbes Haus', desc: 'Village house, 5 min from castle', hasCapacity: true },
   { key: 'schlosskrug', apiName: 'Schlosskrug', label: 'Schlosskrug', desc: 'Village inn, 5 min from castle', hasCapacity: true },
   { key: 'deichgraf', apiName: 'Deichgraf', label: 'Deichgraf Elbpension', desc: 'Premium pension, 5 min from castle', hasCapacity: true },
@@ -621,8 +621,20 @@ export default function RSVPPage() {
                       )
                     })}
                   </div>
+                  {formData.accommodationPreference === 'castle' && (
+                    <div className="bg-c-surface border border-c-gold/30 p-4 mt-3">
+                      <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-c-gold mb-2">
+                        A note on castle rooms
+                      </p>
+                      <p className="text-c-muted text-xs leading-relaxed">
+                        The castle has a mix of rooms — singles, doubles, shared rooms with a mezzanine, and a dorm.
+                        Not everyone can get a private double; we&apos;ll arrange beds based on the full guest mix
+                        (couples together, friends near each other, etc.) and let you know in good time.
+                      </p>
+                    </div>
+                  )}
                   <p className="text-c-dim text-xs mt-3">
-                    Couple wanting a double room? Add a note in step 6 — we&apos;ll coordinate.
+                    Travelling as a couple, or want a specific roommate? Add a note in step 6 — we&apos;ll coordinate.
                   </p>
                 </div>
 
