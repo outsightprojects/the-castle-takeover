@@ -9,6 +9,7 @@ const navItems = [
   { label: 'Home', href: '/' },
   { label: 'About', href: '/about' },
   { label: 'Venue', href: '/venue' },
+  { label: 'Lineup', href: '/lineup' },
   { label: 'RSVP', href: '/tickets' },
 ]
 

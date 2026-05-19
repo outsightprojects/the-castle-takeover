@@ -784,7 +784,7 @@ export default function RSVPPage() {
                     <div>
                       <p className="text-c-white font-medium text-sm">Add a tip (optional)</p>
                       <p className="text-c-dim text-xs">
-                        Helps cover overruns &mdash; or smooth out cheaper-bed contributions
+                        Helps to cover a bit of the costs for us
                       </p>
                     </div>
                     <span className="font-serif text-2xl text-c-gold tabular-nums">

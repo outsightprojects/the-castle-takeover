@@ -261,12 +261,13 @@ export function HomeContent({ guestName }: { guestName?: string }) {
         <div className="text-center max-w-xl mx-auto">
           <p className="text-c-muted leading-relaxed text-[15px] mb-6">
             Bed prices for the whole weekend: Castle &euro;90, Gelbes Haus
-            &euro;75, Schlosskrug &euro;50, Deichgraf &euro;123. Camping and
-            self-arranged are free &mdash; you only pay the event fee. We
-            assign castle rooms based on the full guest mix (couples together,
-            singles where they fit). Got room to give more? There&rsquo;s an
-            optional tip at the end of the RSVP &mdash; helps cover overruns
-            or smooth out cheaper-bed contributions.
+            &euro;75, Schlosskrug &euro;50, Deichgraf &euro;123. Camping costs
+            nothing on top of the event fee. Self-arranged means you only pay
+            the event fee and sort out your own bed (hotel, friend&rsquo;s
+            place, whatever). We assign castle rooms based on the full guest
+            mix (couples together, singles where they fit). There&rsquo;s an
+            optional tip at the end of the RSVP &mdash; that helps to cover a
+            bit of the costs for us.
           </p>
           <p className="text-c-muted leading-relaxed text-[15px]">
             RSVP takes about 2 minutes. You pick your arrival day,
