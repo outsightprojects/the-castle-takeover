@@ -22,6 +22,7 @@ interface BedData {
 interface SubmitResult {
   eventFee: number
   bedFee: number
+  tip: number
   total: number
   venue: string
 }
@@ -81,6 +82,7 @@ export default function RSVPPage() {
     accommodationPreference: '',
     transportMode: '',
     needsShuttle: false,
+    tip: 0,
     name: '',
     email: '',
     phone: '',
@@ -119,7 +121,8 @@ export default function RSVPPage() {
       : venueByApiName(selectedVenueOption.apiName)?.price ??
         FALLBACK_PRICES[selectedVenueOption.key] ??
         0
-  const computedTotal = EVENT_FEE + computedBedFee
+  const computedTip = formData.tip || 0
+  const computedTotal = EVENT_FEE + computedBedFee + computedTip
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -142,6 +145,7 @@ export default function RSVPPage() {
       setSubmitResult({
         eventFee: data.eventFee,
         bedFee: data.bedFee,
+        tip: data.tip,
         total: data.total,
         venue: data.venue,
       })
@@ -279,6 +283,12 @@ export default function RSVPPage() {
                   <div className="flex justify-between text-c-muted">
                     <span>Bed &middot; {submitResult.venue}</span>
                     <span className="font-mono tabular-nums">&euro;{submitResult.bedFee}</span>
+                  </div>
+                )}
+                {submitResult.tip > 0 && (
+                  <div className="flex justify-between text-c-muted">
+                    <span>Tip</span>
+                    <span className="font-mono tabular-nums">&euro;{submitResult.tip}</span>
                   </div>
                 )}
                 <div className="border-t border-c-border pt-2 flex justify-between text-c-white font-medium">
@@ -747,12 +757,59 @@ export default function RSVPPage() {
                       </div>
                     )}
 
+                    {computedTip > 0 && (
+                      <div className="flex justify-between items-baseline">
+                        <div>
+                          <p className="text-c-white font-medium text-sm">Tip</p>
+                          <p className="text-c-dim text-xs">Thank you</p>
+                        </div>
+                        <span className="font-serif text-xl text-c-gold tabular-nums">
+                          &euro;{computedTip}
+                        </span>
+                      </div>
+                    )}
+
                     <div className="border-t border-c-border pt-3 flex justify-between items-baseline">
                       <p className="text-c-white font-medium">Total</p>
                       <span className="font-serif text-3xl font-bold text-c-gold tabular-nums">
                         &euro;{computedTotal}
                       </span>
                     </div>
+                  </div>
+                </div>
+
+                {/* Optional tip slider */}
+                <div className="bg-c-surface border border-c-border p-6 mb-6">
+                  <div className="flex justify-between items-baseline mb-2">
+                    <div>
+                      <p className="text-c-white font-medium text-sm">Add a tip (optional)</p>
+                      <p className="text-c-dim text-xs">
+                        Helps cover overruns &mdash; or smooth out cheaper-bed contributions
+                      </p>
+                    </div>
+                    <span className="font-serif text-2xl text-c-gold tabular-nums">
+                      {computedTip > 0 ? `€${computedTip}` : '—'}
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={300}
+                    step={5}
+                    value={computedTip}
+                    onChange={(e) =>
+                      setFormData({ ...formData, tip: parseInt(e.target.value) || 0 })
+                    }
+                    className="w-full h-1.5 rounded-full appearance-none cursor-pointer mt-3"
+                    aria-label="Tip amount"
+                    style={{
+                      background: `linear-gradient(to right, #C9A84C 0%, #C9A84C ${(computedTip / 300) * 100}%, rgba(255,255,255,0.08) ${(computedTip / 300) * 100}%, rgba(255,255,255,0.08) 100%)`,
+                    }}
+                  />
+                  <div className="flex justify-between text-c-dim text-xs mt-2 font-mono">
+                    <span>€0</span>
+                    <span>€150</span>
+                    <span>€300</span>
                   </div>
                 </div>
 

@@ -234,18 +234,19 @@ export function HomeContent({ guestName }: { guestName?: string }) {
             The practical bit
           </h2>
           <p className="text-c-muted leading-relaxed text-[15px] mb-10 max-w-xl mx-auto">
-            Your contribution covers everything for the weekend &mdash; no
-            extras, no add-ons.
+            Two clear parts: a flat <span className="text-c-white">&euro;100 event fee</span> per
+            person covers the weekend itself, and on top you pay for your bed
+            depending on where you sleep.
           </p>
         </div>
 
         <ul className="space-y-5 mb-12 max-w-xl mx-auto">
           {[
-            { icon: Building, label: 'Castle rent', detail: 'The whole baroque palace, Friday to Sunday' },
             { icon: UtensilsCrossed, label: 'All food', detail: 'Provided throughout the weekend' },
             { icon: Wine, label: 'All drinks', detail: 'Open bar all weekend' },
             { icon: Music, label: 'Music, DJs, sauna', detail: 'Courtyard sets, cellar parties, towels provided' },
-            { icon: Sparkles, label: 'Cleaning & electricity', detail: 'Running a castle for three days has real costs' },
+            { icon: Sparkles, label: 'Cleaning, electricity, logistics', detail: 'Running a castle for three days has real costs' },
+            { icon: Building, label: 'Castle rent & venues', detail: 'Settled through the bed fee — paid 1:1 to each venue' },
           ].map((item) => (
             <li key={item.label} className="flex items-start gap-4">
               <item.icon className="text-c-gold shrink-0 mt-0.5" size={20} strokeWidth={1.5} />
@@ -259,11 +260,13 @@ export function HomeContent({ guestName }: { guestName?: string }) {
 
         <div className="text-center max-w-xl mx-auto">
           <p className="text-c-muted leading-relaxed text-[15px] mb-6">
-            Castle beds are &euro;150 per person &mdash; mostly shared rooms,
-            some doubles. Staying elsewhere? &euro;120 suggested (&euro;100
-            minimum). If you can do more, it helps someone else do less. If
-            it&rsquo;s a stretch, pay what you can &mdash; zero guilt, zero
-            questions.
+            Bed prices for the whole weekend: Castle &euro;90, Gelbes Haus
+            &euro;75, Schlosskrug &euro;50, Deichgraf &euro;123. Camping and
+            self-arranged are free &mdash; you only pay the event fee. We
+            assign castle rooms based on the full guest mix (couples together,
+            singles where they fit). Got room to give more? There&rsquo;s an
+            optional tip at the end of the RSVP &mdash; helps cover overruns
+            or smooth out cheaper-bed contributions.
           </p>
           <p className="text-c-muted leading-relaxed text-[15px]">
             RSVP takes about 2 minutes. You pick your arrival day,

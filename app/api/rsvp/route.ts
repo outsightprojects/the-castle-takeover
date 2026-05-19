@@ -85,6 +85,7 @@ export async function POST(request: NextRequest) {
       skills,
       needsShuttle,
       transportMode,
+      tip,
     } = body
 
     // Pflichtfelder
@@ -102,6 +103,9 @@ export async function POST(request: NextRequest) {
     const venueName = venueKey && VENUE_NAMES[venueKey] ? VENUE_NAMES[venueKey] : 'Noch offen'
     const bedFee = isDayOnly || !venueKey ? 0 : (VENUE_PRICES[venueKey] ?? 0)
 
+    // Optionaler Tip (Slider 0-300 €). Defensive: clamp.
+    const tipAmount = Math.max(0, Math.min(300, parseInt(String(tip ?? 0)) || 0))
+
     // Properties für Notion zusammenbauen
     const properties: Record<string, unknown> = {
       'Name': { title: [{ text: { content: name } }] },
@@ -112,9 +116,10 @@ export async function POST(request: NextRequest) {
           { text: { content: [email, phone].filter(Boolean).join(' | ') } },
         ],
       },
-      // Neue Preisfelder: Event Fee immer 100, Bed Fee abhängig vom Venue.
+      // Neue Preisfelder: Event Fee immer 100, Bed Fee abhängig vom Venue, Tip optional.
       'Event Fee €': { number: EVENT_FEE },
       'Bed Fee €': { number: bedFee },
+      'Tip €': { number: tipAmount },
       'Helfer': { checkbox: willingToHelp || false },
       'Shuttle': { checkbox: needsShuttle || false },
     }
@@ -163,7 +168,8 @@ export async function POST(request: NextRequest) {
       success: true,
       eventFee: EVENT_FEE,
       bedFee,
-      total: EVENT_FEE + bedFee,
+      tip: tipAmount,
+      total: EVENT_FEE + bedFee + tipAmount,
       venue: venueName,
     })
   } catch (error) {
