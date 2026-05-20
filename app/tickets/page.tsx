@@ -660,136 +660,135 @@ export default function RSVPPage() {
                           ? 'No bed cost'
                           : `€${price} per bed · whole weekend`
                       const selected = formData.accommodationPreference === option.key
+                      const showCastleNote = selected && option.key === 'castle'
+                      const showBedTypePicker = selected && !!option.bedTypes
+                      const multi = !!option.bedTypes && option.bedTypes.length > 1
 
                       return (
-                        <label
-                          key={option.key}
-                          className={`block p-4 transition-all min-h-[48px] ${optionClass(selected, isFull)}`}
-                        >
-                          <input
-                            type="radio"
-                            name="accommodationPreference"
-                            value={option.key}
-                            checked={selected}
-                            disabled={isFull}
-                            onChange={(e) => {
-                              // Wenn die Pension nur einen Bett-Typ hat, gleich
-                              // auto-setzen. Bei mehreren (Gelbes Haus) leer
-                              // lassen, damit der Gast aktiv wählen muss.
-                              const newOpt = ACCOMMODATION_OPTIONS.find((o) => o.key === e.target.value)
-                              const defaultBedType =
-                                newOpt?.bedTypes && newOpt.bedTypes.length === 1
-                                  ? newOpt.bedTypes[0].key
-                                  : ''
-                              setFormData({
-                                ...formData,
-                                accommodationPreference: e.target.value,
-                                bedTypePreference: defaultBedType,
-                              })
-                            }}
-                            className="sr-only"
-                          />
-                          <div className="flex justify-between items-start gap-3">
-                            <div className="min-w-0">
-                              <span className="font-medium text-sm block">{option.label}</span>
-                              <span
-                                className={`text-xs ${
-                                  selected ? 'text-c-black/60' : 'text-c-dim'
-                                }`}
-                              >
-                                {isFull ? 'Currently full' : option.desc}
-                              </span>
-                              {priceText && (
+                        <div key={option.key}>
+                          <label
+                            className={`block p-4 transition-all min-h-[48px] ${optionClass(selected, isFull)}`}
+                          >
+                            <input
+                              type="radio"
+                              name="accommodationPreference"
+                              value={option.key}
+                              checked={selected}
+                              disabled={isFull}
+                              onChange={(e) => {
+                                // Wenn die Pension nur einen Bett-Typ hat, gleich
+                                // auto-setzen. Bei mehreren (Gelbes Haus) leer
+                                // lassen, damit der Gast aktiv wählen muss.
+                                const newOpt = ACCOMMODATION_OPTIONS.find((o) => o.key === e.target.value)
+                                const defaultBedType =
+                                  newOpt?.bedTypes && newOpt.bedTypes.length === 1
+                                    ? newOpt.bedTypes[0].key
+                                    : ''
+                                setFormData({
+                                  ...formData,
+                                  accommodationPreference: e.target.value,
+                                  bedTypePreference: defaultBedType,
+                                })
+                              }}
+                              className="sr-only"
+                            />
+                            <div className="flex justify-between items-start gap-3">
+                              <div className="min-w-0">
+                                <span className="font-medium text-sm block">{option.label}</span>
                                 <span
-                                  className={`font-mono text-[11px] tracking-wide block mt-1 ${
-                                    selected ? 'text-c-black/50' : 'text-c-dim'
+                                  className={`text-xs ${
+                                    selected ? 'text-c-black/60' : 'text-c-dim'
                                   }`}
                                 >
-                                  {priceText}
+                                  {isFull ? 'Currently full' : option.desc}
+                                </span>
+                                {priceText && (
+                                  <span
+                                    className={`font-mono text-[11px] tracking-wide block mt-1 ${
+                                      selected ? 'text-c-black/50' : 'text-c-dim'
+                                    }`}
+                                  >
+                                    {priceText}
+                                  </span>
+                                )}
+                              </div>
+                              {availText && (
+                                <span
+                                  className={`font-mono text-xs shrink-0 mt-0.5 ${
+                                    selected ? 'text-c-black/60' : 'text-c-dim'
+                                  }`}
+                                >
+                                  {availText}
                                 </span>
                               )}
                             </div>
-                            {availText && (
-                              <span
-                                className={`font-mono text-xs shrink-0 mt-0.5 ${
-                                  selected ? 'text-c-black/60' : 'text-c-dim'
-                                }`}
-                              >
-                                {availText}
-                              </span>
-                            )}
-                          </div>
-                        </label>
+                          </label>
+
+                          {/* Inline expand: Castle note */}
+                          {showCastleNote && (
+                            <div className="bg-c-surface border border-c-gold/30 p-4 mt-2">
+                              <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-c-gold mb-2">
+                                A note on castle rooms
+                              </p>
+                              <p className="text-c-muted text-xs leading-relaxed">
+                                The castle has a mix of rooms — singles, doubles, shared rooms with a mezzanine, and a dorm.
+                                Not everyone can get a private double; we&apos;ll arrange beds based on the full guest mix
+                                (couples together, friends near each other, etc.) and let you know in good time.
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Inline expand: Bett-Typ Sub-Auswahl für die Pensionen */}
+                          {showBedTypePicker && option.bedTypes && (
+                            <div className="bg-c-surface border border-c-gold/30 p-4 mt-2">
+                              <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-c-gold mb-2">
+                                What bed are you booking?
+                              </p>
+                              {option.bedTypesNote && (
+                                <p className="text-c-muted text-xs leading-relaxed mb-4">
+                                  {option.bedTypesNote}
+                                </p>
+                              )}
+                              <div className="space-y-2">
+                                {option.bedTypes.map((bt) => {
+                                  const btSelected = formData.bedTypePreference === bt.key
+                                  return (
+                                    <label
+                                      key={bt.key}
+                                      className={`block p-3 transition-all ${optionClass(btSelected)}`}
+                                    >
+                                      <input
+                                        type="radio"
+                                        name="bedTypePreference"
+                                        value={bt.key}
+                                        checked={btSelected}
+                                        onChange={(e) =>
+                                          setFormData({
+                                            ...formData,
+                                            bedTypePreference: e.target.value,
+                                          })
+                                        }
+                                        disabled={!multi}
+                                        className="sr-only"
+                                      />
+                                      <span className="font-medium text-sm block">{bt.label}</span>
+                                      <span
+                                        className={`text-xs ${
+                                          btSelected ? 'text-c-black/60' : 'text-c-dim'
+                                        }`}
+                                      >
+                                        {bt.desc}
+                                      </span>
+                                    </label>
+                                  )
+                                })}
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       )
                     })}
                   </div>
-                  {formData.accommodationPreference === 'castle' && (
-                    <div className="bg-c-surface border border-c-gold/30 p-4 mt-3">
-                      <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-c-gold mb-2">
-                        A note on castle rooms
-                      </p>
-                      <p className="text-c-muted text-xs leading-relaxed">
-                        The castle has a mix of rooms — singles, doubles, shared rooms with a mezzanine, and a dorm.
-                        Not everyone can get a private double; we&apos;ll arrange beds based on the full guest mix
-                        (couples together, friends near each other, etc.) and let you know in good time.
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Bett-Typ Sub-Auswahl für die Pensionen */}
-                  {(() => {
-                    const opt = ACCOMMODATION_OPTIONS.find(
-                      (o) => o.key === formData.accommodationPreference
-                    )
-                    if (!opt?.bedTypes) return null
-                    const multi = opt.bedTypes.length > 1
-                    return (
-                      <div className="bg-c-surface border border-c-gold/30 p-4 mt-3">
-                        <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-c-gold mb-2">
-                          What bed are you booking?
-                        </p>
-                        {opt.bedTypesNote && (
-                          <p className="text-c-muted text-xs leading-relaxed mb-4">
-                            {opt.bedTypesNote}
-                          </p>
-                        )}
-                        <div className="space-y-2">
-                          {opt.bedTypes.map((bt) => {
-                            const btSelected = formData.bedTypePreference === bt.key
-                            return (
-                              <label
-                                key={bt.key}
-                                className={`block p-3 transition-all ${optionClass(btSelected)}`}
-                              >
-                                <input
-                                  type="radio"
-                                  name="bedTypePreference"
-                                  value={bt.key}
-                                  checked={btSelected}
-                                  onChange={(e) =>
-                                    setFormData({
-                                      ...formData,
-                                      bedTypePreference: e.target.value,
-                                    })
-                                  }
-                                  disabled={!multi}
-                                  className="sr-only"
-                                />
-                                <span className="font-medium text-sm block">{bt.label}</span>
-                                <span
-                                  className={`text-xs ${
-                                    btSelected ? 'text-c-black/60' : 'text-c-dim'
-                                  }`}
-                                >
-                                  {bt.desc}
-                                </span>
-                              </label>
-                            )
-                          })}
-                        </div>
-                      </div>
-                    )
-                  })()}
 
                   <p className="text-c-dim text-xs mt-3">
                     Travelling as a couple, or want a specific roommate? Add a note in step 6 — we&apos;ll coordinate.
