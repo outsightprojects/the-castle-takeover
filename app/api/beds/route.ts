@@ -47,7 +47,10 @@ interface VenueStatus {
 
 export async function GET() {
   try {
-    // 1) Bed Inventory: wie viele physische Betten existieren pro Venue?
+    // 1) Bed Inventory: zähle nur Betten, die noch frei sind.
+    //    Status "Assigned", "Blocked" und "Held" zählen nicht zur freien
+    //    Kapazität, damit manuell zugewiesene Betten nicht doppelt vergeben
+    //    werden können.
     const totals: Record<string, number> = {}
     let bedCursor: string | undefined = undefined
     do {
@@ -60,13 +63,20 @@ export async function GET() {
         if (!('properties' in page)) continue
         const rawVenue = (page.properties as any)['Venue']?.select?.name
         if (!rawVenue) continue
+        const status = (page.properties as any)['Status']?.select?.name
+        if (status !== 'Available') continue
         const venue = BED_VENUE_ALIAS[rawVenue] ?? rawVenue
         totals[venue] = (totals[venue] || 0) + 1
       }
       bedCursor = bedResp.has_more ? bedResp.next_cursor : undefined
     } while (bedCursor)
 
-    // 2) Gästeliste: wie viele Gäste haben welches Venue gewählt (und nicht abgesagt)?
+    // 2) Gästeliste: zähle nur Gäste, die ein Venue gewählt haben, NICHT
+    //    abgesagt sind, übernachten — UND die noch keinen konkreten Bed Slot
+    //    zugewiesen bekommen haben. Gäste mit Bed Slot Relation haben ihr
+    //    Bett bereits im Inventory belegt (Status != Available), wurden also
+    //    schon aus den totals rausgerechnet. Sie hier nochmal als "taken"
+    //    zu zählen wäre Doppelzählung.
     const taken: Record<string, number> = {}
     let guestCursor: string | undefined = undefined
     do {
@@ -76,6 +86,7 @@ export async function GET() {
           and: [
             { property: 'Status', select: { does_not_equal: 'Abgesagt' } },
             { property: 'Übernachtung', select: { does_not_equal: 'Nein' } },
+            { property: 'Bed Slot', relation: { is_empty: true } },
           ],
         },
         start_cursor: guestCursor,
