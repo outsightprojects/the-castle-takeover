@@ -68,6 +68,19 @@ function mapTransport(mode: string): string {
   }
 }
 
+// Frontend-Key → Notion-Select-Option für "Bett-Typ".
+// Nur relevant für Pensionen (gelbeshaus/schlosskrug/deichgraf).
+function mapBedType(bedType: string | undefined): string | null {
+  switch (bedType) {
+    case 'double-shared':
+      return 'Doppelbett-Slot'
+    case 'single':
+      return 'Einzelbett'
+    default:
+      return null
+  }
+}
+
 // ─── Route ────────────────────────────────────────────────────────────────
 export async function POST(request: NextRequest) {
   try {
@@ -81,6 +94,7 @@ export async function POST(request: NextRequest) {
       arrivalDay,
       stayDuration,
       accommodationPreference,
+      bedTypePreference,
       invitedBy,
       notes,
       willingToHelp,
@@ -139,6 +153,13 @@ export async function POST(request: NextRequest) {
       properties['Übernachtung'] = { select: { name: 'Ja' } }
       properties['Nächte'] = { select: { name: mapStayDuration(stayDuration) } }
       properties['Unterkunft'] = { select: { name: venueName } }
+
+      // Bett-Typ: nur für die Pensionen relevant. Castle/Camping/Self erhalten
+      // die Property nicht (Notion lässt sie dann einfach leer).
+      const bedTypeName = mapBedType(bedTypePreference)
+      if (bedTypeName) {
+        properties['Bett-Typ'] = { select: { name: bedTypeName } }
+      }
     }
 
     if (transportMode) {

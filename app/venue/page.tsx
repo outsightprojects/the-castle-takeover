@@ -341,19 +341,19 @@ export default function VenuePage() {
             {
               icon: Home,
               title: 'Gelbes Haus',
-              desc: 'A house we’ve reserved in the village, ~5 min from the castle.',
+              desc: 'Village house, ~5 min from the castle. A 5-person room (two shared double beds + one single bed) plus a double room with a shared double bed.',
               tag: '€75',
             },
             {
               icon: Home,
               title: 'Schlosskrug',
-              desc: 'Village inn, ~5 min from the castle.',
+              desc: 'Village inn, ~5 min from the castle. Two double rooms, each with one shared double bed — perfect for a couple or close friends.',
               tag: '€50',
             },
             {
               icon: Home,
               title: 'Deichgraf Elbpension',
-              desc: 'Premium pension nearby, ~5 min from the castle.',
+              desc: 'Premium pension nearby, ~5 min from the castle. Two double rooms, each with one shared double bed.',
               tag: '€123',
             },
             {

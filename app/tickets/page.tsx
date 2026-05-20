@@ -42,17 +42,91 @@ const FALLBACK_PRICES: Record<string, number> = {
   self: 0,
 }
 
+// Bett-Typ sub-options pro Pension (B+a+i Variante).
+// 'double-shared' = halbes Doppelbett, geteilt mit einem anderen Gast.
+// 'single' = eigenes Einzelbett (nur Gelbes Haus 5er-Zimmer).
+type BedTypeKey = 'double-shared' | 'single'
+
+interface BedTypeOption {
+  key: BedTypeKey
+  apiName: string // wird so an Notion-Property "Bett-Typ" geschrieben
+  label: string
+  desc: string
+}
+
 const ACCOMMODATION_OPTIONS: Array<{
   key: string
   apiName: string
   label: string
   desc: string
   hasCapacity: boolean
+  bedTypes?: BedTypeOption[] // wenn gesetzt → Sub-Auswahl in Step 4 nach Pension-Klick
+  bedTypesNote?: string // Erklärtext über der Sub-Auswahl
 }> = [
-  { key: 'castle', apiName: 'Castle', label: 'Castle', desc: 'Inside the castle — mix of room types', hasCapacity: true },
-  { key: 'gelbeshaus', apiName: 'Gelbes Haus', label: 'Gelbes Haus', desc: 'Village house, 5 min from castle', hasCapacity: true },
-  { key: 'schlosskrug', apiName: 'Schlosskrug', label: 'Schlosskrug', desc: 'Village inn, 5 min from castle', hasCapacity: true },
-  { key: 'deichgraf', apiName: 'Deichgraf', label: 'Deichgraf Elbpension', desc: 'Premium pension, 5 min from castle', hasCapacity: true },
+  {
+    key: 'castle',
+    apiName: 'Castle',
+    label: 'Castle',
+    desc: 'Inside the castle — mix of room types',
+    hasCapacity: true,
+  },
+  {
+    key: 'gelbeshaus',
+    apiName: 'Gelbes Haus',
+    label: 'Gelbes Haus',
+    desc: 'Village house, 5 min from castle',
+    hasCapacity: true,
+    bedTypesNote:
+      'Gelbes Haus has two rooms: a 5-person room with two double beds and one single bed, plus a double room with one double bed. Pick what you want.',
+    bedTypes: [
+      {
+        key: 'double-shared',
+        apiName: 'Doppelbett-Slot',
+        label: 'Half of a shared double bed',
+        desc: "You'll share a double bed with one other guest (couple, friend, or we'll match you).",
+      },
+      {
+        key: 'single',
+        apiName: 'Einzelbett',
+        label: 'Single bed (in the 5-person room)',
+        desc: 'Your own single bed inside the shared 5-person room. Only one of these in the whole house.',
+      },
+    ],
+  },
+  {
+    key: 'schlosskrug',
+    apiName: 'Schlosskrug',
+    label: 'Schlosskrug',
+    desc: 'Village inn, 5 min from castle',
+    hasCapacity: true,
+    bedTypesNote:
+      'Two double rooms, each with one double bed. By picking a bed here, you book half of a shared double bed in a double room.',
+    bedTypes: [
+      {
+        key: 'double-shared',
+        apiName: 'Doppelbett-Slot',
+        label: 'Half of a shared double bed, in a double room',
+        desc: "You'll share a double bed with one other guest (couple, friend, or we'll match you).",
+      },
+    ],
+  },
+  {
+    key: 'deichgraf',
+    apiName: 'Deichgraf',
+    label: 'Deichgraf Elbpension',
+    desc: 'Premium pension, 5 min from castle',
+    hasCapacity: true,
+    bedTypesNote:
+      'Two double rooms, each with one double bed. By picking a bed here, you book half of a shared double bed in a double room.',
+    bedTypes: [
+      {
+        key: 'double-shared',
+        apiName: 'Doppelbett-Slot',
+        label: 'Half of a shared double bed, in a double room',
+        desc: "You'll share a double bed with one other guest (couple, friend, or we'll match you).",
+      },
+    ],
+  },
   { key: 'camping', apiName: 'Camping', label: 'Camping', desc: 'Tent or camper on the grounds', hasCapacity: false },
   { key: 'self', apiName: 'Self-Provided', label: 'Self-arranged', desc: 'Hotel, Airbnb — your call', hasCapacity: false },
 ]
@@ -81,6 +155,7 @@ export default function RSVPPage() {
     arrivalDay: '',
     stayDuration: '',
     accommodationPreference: '',
+    bedTypePreference: '', // 'double-shared' | 'single' | '' (Pensionen only)
     transportMode: '',
     needsShuttle: false,
     eventFee: EVENT_FEE_MIN,
@@ -170,7 +245,16 @@ export default function RSVPPage() {
       case 1: return formData.attendance !== ''
       case 2: return formData.invitedBy !== ''
       case 3: return formData.arrivalDay !== '' && formData.stayDuration !== ''
-      case 4: return formData.accommodationPreference !== ''
+      case 4: {
+        if (formData.accommodationPreference === '') return false
+        // Pensionen mit mehr als einer Bett-Variante (aktuell nur Gelbes Haus)
+        // brauchen eine explizite Bett-Typ-Wahl.
+        const opt = ACCOMMODATION_OPTIONS.find((o) => o.key === formData.accommodationPreference)
+        if (opt?.bedTypes && opt.bedTypes.length > 1) {
+          return formData.bedTypePreference !== ''
+        }
+        return true
+      }
       case 5: return true // cost review is read-only
       case 6: return formData.name !== '' && formData.email !== ''
       default: return false
@@ -588,12 +672,21 @@ export default function RSVPPage() {
                             value={option.key}
                             checked={selected}
                             disabled={isFull}
-                            onChange={(e) =>
+                            onChange={(e) => {
+                              // Wenn die Pension nur einen Bett-Typ hat, gleich
+                              // auto-setzen. Bei mehreren (Gelbes Haus) leer
+                              // lassen, damit der Gast aktiv wählen muss.
+                              const newOpt = ACCOMMODATION_OPTIONS.find((o) => o.key === e.target.value)
+                              const defaultBedType =
+                                newOpt?.bedTypes && newOpt.bedTypes.length === 1
+                                  ? newOpt.bedTypes[0].key
+                                  : ''
                               setFormData({
                                 ...formData,
                                 accommodationPreference: e.target.value,
+                                bedTypePreference: defaultBedType,
                               })
-                            }
+                            }}
                             className="sr-only"
                           />
                           <div className="flex justify-between items-start gap-3">
@@ -642,6 +735,62 @@ export default function RSVPPage() {
                       </p>
                     </div>
                   )}
+
+                  {/* Bett-Typ Sub-Auswahl für die Pensionen */}
+                  {(() => {
+                    const opt = ACCOMMODATION_OPTIONS.find(
+                      (o) => o.key === formData.accommodationPreference
+                    )
+                    if (!opt?.bedTypes) return null
+                    const multi = opt.bedTypes.length > 1
+                    return (
+                      <div className="bg-c-surface border border-c-gold/30 p-4 mt-3">
+                        <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-c-gold mb-2">
+                          What bed are you booking?
+                        </p>
+                        {opt.bedTypesNote && (
+                          <p className="text-c-muted text-xs leading-relaxed mb-4">
+                            {opt.bedTypesNote}
+                          </p>
+                        )}
+                        <div className="space-y-2">
+                          {opt.bedTypes.map((bt) => {
+                            const btSelected = formData.bedTypePreference === bt.key
+                            return (
+                              <label
+                                key={bt.key}
+                                className={`block p-3 transition-all ${optionClass(btSelected)}`}
+                              >
+                                <input
+                                  type="radio"
+                                  name="bedTypePreference"
+                                  value={bt.key}
+                                  checked={btSelected}
+                                  onChange={(e) =>
+                                    setFormData({
+                                      ...formData,
+                                      bedTypePreference: e.target.value,
+                                    })
+                                  }
+                                  disabled={!multi}
+                                  className="sr-only"
+                                />
+                                <span className="font-medium text-sm block">{bt.label}</span>
+                                <span
+                                  className={`text-xs ${
+                                    btSelected ? 'text-c-black/60' : 'text-c-dim'
+                                  }`}
+                                >
+                                  {bt.desc}
+                                </span>
+                              </label>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )
+                  })()}
+
                   <p className="text-c-dim text-xs mt-3">
                     Travelling as a couple, or want a specific roommate? Add a note in step 6 — we&apos;ll coordinate.
                   </p>
