@@ -723,7 +723,8 @@ export default function RSVPPage() {
                   Your contribution
                 </h2>
                 <p className="text-c-dim text-sm mb-8">
-                  Event fee covers food, drinks, music, deco. Bed fee goes 1:1 to the venues.
+                  Event fee helps cover parts of the food, drinks, music, and deco.
+                  Bed fee goes 1:1 to the venues.
                 </p>
 
                 <div className="bg-c-surface border border-c-border p-6 mb-6">
@@ -735,8 +736,8 @@ export default function RSVPPage() {
                           <p className="text-c-white font-medium text-sm">Event fee</p>
                           <p className="text-c-dim text-xs">
                             {computedEventFee > EVENT_FEE_MIN
-                              ? `Base €${EVENT_FEE_MIN} + €${computedEventFee - EVENT_FEE_MIN} extra — thank you`
-                              : `Base €${EVENT_FEE_MIN} — slide up to chip in more`}
+                              ? `Base €${EVENT_FEE_MIN} + €${computedEventFee - EVENT_FEE_MIN} birthday gift — thank you`
+                              : `Base €${EVENT_FEE_MIN} — slide up to add a birthday gift`}
                           </p>
                         </div>
                         <span
@@ -805,6 +806,17 @@ export default function RSVPPage() {
                       </span>
                     </div>
                   </div>
+                </div>
+
+                <div className="border border-c-gold/30 bg-c-gold/[0.04] p-5 mb-6">
+                  <p className="font-mono text-[10px] tracking-[0.3em] uppercase text-c-gold mb-2">
+                    A small note
+                  </p>
+                  <p className="text-c-muted text-sm leading-relaxed">
+                    Anything you add above the &euro;{EVENT_FEE_MIN} base is a birthday gift
+                    to Cari, Peter &amp; Georg — we&rsquo;d be more than happy about it.
+                    No pressure though, &euro;{EVENT_FEE_MIN} is completely fine.
+                  </p>
                 </div>
 
                 <p className="text-c-dim text-xs leading-relaxed">
