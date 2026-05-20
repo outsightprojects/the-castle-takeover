@@ -325,31 +325,54 @@ export default function VenuePage() {
           </h2>
         </div>
 
+        <p className="text-c-muted text-sm leading-relaxed text-center max-w-xl mx-auto mb-10">
+          We&rsquo;ve reserved beds in four places. Pick one in the RSVP &mdash;
+          bed prices below are for the whole weekend, on top of the &euro;100 event fee.
+        </p>
+
         <div className="space-y-0">
           {[
             {
               icon: BedDouble,
               title: 'In the Castle',
-              desc: 'Around 90 beds \u2014 mostly shared rooms, some doubles. \u20AC90 per bed. We\u2019ll do our best to fit everyone\u2019s needs.',
-              tag: '~90 beds',
+              desc: 'Around 90 beds — mostly shared rooms, some doubles, a few singles. We assign based on the full guest mix.',
+              tag: '€90',
             },
             {
               icon: Home,
-              title: 'Self-organized Hotel/Pension nearby',
-              desc: 'Houses or hotels ~5 min from castle. Self-arranged — book your own.',
-              tag: 'Self-arrange',
+              title: 'Gelbes Haus',
+              desc: 'A house we’ve reserved in the village, ~5 min from the castle.',
+              tag: '€75',
+            },
+            {
+              icon: Home,
+              title: 'Schlosskrug',
+              desc: 'Village inn, ~5 min from the castle.',
+              tag: '€50',
+            },
+            {
+              icon: Home,
+              title: 'Deichgraf Elbpension',
+              desc: 'Premium pension nearby, ~5 min from the castle.',
+              tag: '€123',
             },
             {
               icon: Tent,
               title: 'Camping',
-              desc: 'Bring your tent or camper \u2014 plenty of space on the grounds. Castle bathrooms available.',
-              tag: 'Unlimited',
+              desc: 'Bring your tent or camper — plenty of space on the grounds. Castle bathrooms available.',
+              tag: 'Free',
             },
-          ].map((item, i) => (
+            {
+              icon: MapPin,
+              title: 'Self-arranged',
+              desc: 'Sort out your own bed (hotel, friend’s place, Airbnb). You only pay the event fee.',
+              tag: 'Self',
+            },
+          ].map((item, i, arr) => (
             <div
               key={item.title}
-              className={`flex items-start justify-between gap-4 py-8 ${
-                i < 2 ? 'border-b border-c-border' : ''
+              className={`flex items-start justify-between gap-4 py-7 ${
+                i < arr.length - 1 ? 'border-b border-c-border' : ''
               }`}
             >
               <div className="flex items-start gap-4">

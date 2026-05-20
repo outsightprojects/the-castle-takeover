@@ -199,7 +199,7 @@ export default function AboutPage() {
         <div>
           <FAQItem
             question="How much does it cost?"
-            answer="We're asking for a solidarity contribution to cover the castle rent, all food and drinks, music, the sauna, cleaning, and electricity — running a baroque palace for three days has real costs. Castle beds are &euro;150 per person — mostly shared rooms, some doubles. We'll do our best to fit everyone's needs. Staying elsewhere? &euro;120 is the suggested amount (&euro;100 minimum) — covers your share of everything except the bed. Pay what works. Can you do more? Amazing, it helps others."
+            answer="Two parts. A &euro;100 event fee per person covers food, drinks, music, sauna, deco, cleaning, electricity, and the logistics of running a baroque palace for three days. On top, you pay for your bed depending on where you sleep: Castle &euro;90, Gelbes Haus &euro;75, Schlosskrug &euro;50, Deichgraf &euro;123 — all for the whole weekend. Camping costs nothing on top of the event fee, and self-arranged means you only pay the event fee and sort out your own bed. If you want to chip in more than &euro;100, there's a slider in the RSVP — every extra euro helps cover the bigger pieces."
           />
           <FAQItem
             question="Can I bring someone?"
@@ -223,7 +223,7 @@ export default function AboutPage() {
           />
           <FAQItem
             question="Where do I sleep?"
-            answer="About 90 beds in the castle (&euro;150 per bed — mostly shared rooms, some doubles, we'll fit everyone's needs), self-organized hotel/pension nearby (&euro;120 suggested, &euro;100 minimum), or camping on the grounds. You pick in the RSVP."
+            answer="Six options in the RSVP. Castle (~90 beds, &euro;90 — mostly shared rooms with some doubles, we assign based on the full guest mix). Gelbes Haus (&euro;75) and Schlosskrug (&euro;50) are houses we've reserved in the village, ~5 min from the castle. Deichgraf (&euro;123) is a pension nearby. Camping on the grounds is free. Self-arranged means you sort out your own bed (hotel, friend's place, Airbnb) and just pay the event fee. All bed prices are for the whole weekend."
           />
         </div>
       </section>

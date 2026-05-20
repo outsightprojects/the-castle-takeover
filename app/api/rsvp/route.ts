@@ -8,7 +8,10 @@ const DATA_SOURCE_ID = process.env.NOTION_GUEST_DS_ID!
 // Single Source of Truth ist die Notion-Event-Konfiguration. Diese Werte
 // hier sind ein Fallback / Performance-Cache. Bei Preisänderung BEIDE Stellen
 // aktualisieren.
-const EVENT_FEE = 100
+// Event Fee ist variabel: Slider im UI 100-300, API clampt großzügiger
+// (bis 1000), falls jemand händisch postet.
+const EVENT_FEE_MIN = 100
+const EVENT_FEE_MAX_HARD = 1000
 
 const VENUE_PRICES: Record<string, number> = {
   castle: 90,
@@ -85,7 +88,7 @@ export async function POST(request: NextRequest) {
       skills,
       needsShuttle,
       transportMode,
-      tip,
+      eventFee,
     } = body
 
     // Pflichtfelder
@@ -103,8 +106,12 @@ export async function POST(request: NextRequest) {
     const venueName = venueKey && VENUE_NAMES[venueKey] ? VENUE_NAMES[venueKey] : 'Noch offen'
     const bedFee = isDayOnly || !venueKey ? 0 : (VENUE_PRICES[venueKey] ?? 0)
 
-    // Optionaler Tip (Slider 0-300 €). Defensive: clamp.
-    const tipAmount = Math.max(0, Math.min(300, parseInt(String(tip ?? 0)) || 0))
+    // Event Fee: variabel, mindestens 100, maximal 1000 (UI begrenzt auf 300,
+    // hier defensiver Hard-Cap gegen Spam/Tippfehler).
+    const eventFeeAmount = Math.max(
+      EVENT_FEE_MIN,
+      Math.min(EVENT_FEE_MAX_HARD, parseInt(String(eventFee ?? EVENT_FEE_MIN)) || EVENT_FEE_MIN)
+    )
 
     // Properties für Notion zusammenbauen
     const properties: Record<string, unknown> = {
@@ -116,10 +123,12 @@ export async function POST(request: NextRequest) {
           { text: { content: [email, phone].filter(Boolean).join(' | ') } },
         ],
       },
-      // Neue Preisfelder: Event Fee immer 100, Bed Fee abhängig vom Venue, Tip optional.
-      'Event Fee €': { number: EVENT_FEE },
+      // Preisfelder: Event Fee variabel (min 100), Bed Fee abhängig vom Venue.
+      // Tip-Feld bleibt in Notion bestehen (Formula "Offen €" referenziert es),
+      // wird aber vom neuen RSVP-Flow nicht mehr gesetzt — Default 0.
+      'Event Fee €': { number: eventFeeAmount },
       'Bed Fee €': { number: bedFee },
-      'Tip €': { number: tipAmount },
+      'Tip €': { number: 0 },
       'Helfer': { checkbox: willingToHelp || false },
       'Shuttle': { checkbox: needsShuttle || false },
     }
@@ -166,10 +175,9 @@ export async function POST(request: NextRequest) {
     // direkt im UI und im PayPal-Link an.
     return NextResponse.json({
       success: true,
-      eventFee: EVENT_FEE,
+      eventFee: eventFeeAmount,
       bedFee,
-      tip: tipAmount,
-      total: EVENT_FEE + bedFee + tipAmount,
+      total: eventFeeAmount + bedFee,
       venue: venueName,
     })
   } catch (error) {

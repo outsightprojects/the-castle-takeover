@@ -265,9 +265,9 @@ export function HomeContent({ guestName }: { guestName?: string }) {
             nothing on top of the event fee. Self-arranged means you only pay
             the event fee and sort out your own bed (hotel, friend&rsquo;s
             place, whatever). We assign castle rooms based on the full guest
-            mix (couples together, singles where they fit). There&rsquo;s an
-            optional tip at the end of the RSVP &mdash; that helps to cover a
-            bit of the costs for us.
+            mix (couples together, singles where they fit). If you want to
+            chip in more than &euro;100, there&rsquo;s a slider in the RSVP
+            &mdash; every extra euro helps cover the bigger pieces.
           </p>
           <p className="text-c-muted leading-relaxed text-[15px]">
             RSVP takes about 2 minutes. You pick your arrival day,

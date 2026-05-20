@@ -22,7 +22,6 @@ interface BedData {
 interface SubmitResult {
   eventFee: number
   bedFee: number
-  tip: number
   total: number
   venue: string
 }
@@ -30,7 +29,9 @@ interface SubmitResult {
 // ─── Constants ────────────────────────────────────────────────────────────
 // Quelle of Truth: Notion Event-Konfiguration. Bei Preisänderung dort UND
 // hier UND in rsvp-route.ts synchron halten.
-const EVENT_FEE = 100
+const EVENT_FEE_MIN = 100
+const EVENT_FEE_MAX = 300
+const EVENT_FEE_STEP = 5
 
 const FALLBACK_PRICES: Record<string, number> = {
   castle: 90,
@@ -82,7 +83,7 @@ export default function RSVPPage() {
     accommodationPreference: '',
     transportMode: '',
     needsShuttle: false,
-    tip: 0,
+    eventFee: EVENT_FEE_MIN,
     name: '',
     email: '',
     phone: '',
@@ -121,8 +122,13 @@ export default function RSVPPage() {
       : venueByApiName(selectedVenueOption.apiName)?.price ??
         FALLBACK_PRICES[selectedVenueOption.key] ??
         0
-  const computedTip = formData.tip || 0
-  const computedTotal = EVENT_FEE + computedBedFee + computedTip
+  // Event fee ist jetzt variabel: min 100, max 300. Werte aus formData kommen
+  // direkt vom Slider in Step 5.
+  const computedEventFee = Math.max(
+    EVENT_FEE_MIN,
+    Math.min(EVENT_FEE_MAX, formData.eventFee || EVENT_FEE_MIN)
+  )
+  const computedTotal = computedEventFee + computedBedFee
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -145,7 +151,6 @@ export default function RSVPPage() {
       setSubmitResult({
         eventFee: data.eventFee,
         bedFee: data.bedFee,
-        tip: data.tip,
         total: data.total,
         venue: data.venue,
       })
@@ -283,12 +288,6 @@ export default function RSVPPage() {
                   <div className="flex justify-between text-c-muted">
                     <span>Bed &middot; {submitResult.venue}</span>
                     <span className="font-mono tabular-nums">&euro;{submitResult.bedFee}</span>
-                  </div>
-                )}
-                {submitResult.tip > 0 && (
-                  <div className="flex justify-between text-c-muted">
-                    <span>Tip</span>
-                    <span className="font-mono tabular-nums">&euro;{submitResult.tip}</span>
                   </div>
                 )}
                 <div className="border-t border-c-border pt-2 flex justify-between text-c-white font-medium">
@@ -728,15 +727,57 @@ export default function RSVPPage() {
                 </p>
 
                 <div className="bg-c-surface border border-c-border p-6 mb-6">
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-baseline">
-                      <div>
-                        <p className="text-c-white font-medium text-sm">Event fee</p>
-                        <p className="text-c-dim text-xs">Food, drinks, music, deco</p>
+                  <div className="space-y-5">
+                    {/* Event fee row with slider */}
+                    <div>
+                      <div className="flex justify-between items-baseline">
+                        <div>
+                          <p className="text-c-white font-medium text-sm">Event fee</p>
+                          <p className="text-c-dim text-xs">
+                            {computedEventFee > EVENT_FEE_MIN
+                              ? `Base €${EVENT_FEE_MIN} + €${computedEventFee - EVENT_FEE_MIN} extra — thank you`
+                              : `Base €${EVENT_FEE_MIN} — slide up to chip in more`}
+                          </p>
+                        </div>
+                        <span
+                          className={`font-serif text-2xl tabular-nums ${
+                            computedEventFee > EVENT_FEE_MIN ? 'text-c-gold' : 'text-c-white'
+                          }`}
+                        >
+                          &euro;{computedEventFee}
+                        </span>
                       </div>
-                      <span className="font-serif text-xl text-c-white tabular-nums">
-                        &euro;{EVENT_FEE}
-                      </span>
+                      <input
+                        type="range"
+                        min={EVENT_FEE_MIN}
+                        max={EVENT_FEE_MAX}
+                        step={EVENT_FEE_STEP}
+                        value={computedEventFee}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            eventFee: parseInt(e.target.value) || EVENT_FEE_MIN,
+                          })
+                        }
+                        className="w-full h-1.5 rounded-full appearance-none cursor-pointer mt-4"
+                        aria-label="Event fee amount"
+                        style={{
+                          background: `linear-gradient(to right, #C9A84C 0%, #C9A84C ${
+                            ((computedEventFee - EVENT_FEE_MIN) /
+                              (EVENT_FEE_MAX - EVENT_FEE_MIN)) *
+                            100
+                          }%, rgba(255,255,255,0.08) ${
+                            ((computedEventFee - EVENT_FEE_MIN) /
+                              (EVENT_FEE_MAX - EVENT_FEE_MIN)) *
+                            100
+                          }%, rgba(255,255,255,0.08) 100%)`,
+                        }}
+                      />
+                      <div className="flex justify-between text-c-dim text-xs mt-2 font-mono">
+                        <span>€{EVENT_FEE_MIN}</span>
+                        <span>€{Math.round((EVENT_FEE_MIN + EVENT_FEE_MAX) / 2)}</span>
+                        <span>€{EVENT_FEE_MAX}</span>
+                      </div>
                     </div>
 
                     {!isDayOnly && selectedVenueOption && (
@@ -757,59 +798,12 @@ export default function RSVPPage() {
                       </div>
                     )}
 
-                    {computedTip > 0 && (
-                      <div className="flex justify-between items-baseline">
-                        <div>
-                          <p className="text-c-white font-medium text-sm">Tip</p>
-                          <p className="text-c-dim text-xs">Thank you</p>
-                        </div>
-                        <span className="font-serif text-xl text-c-gold tabular-nums">
-                          &euro;{computedTip}
-                        </span>
-                      </div>
-                    )}
-
                     <div className="border-t border-c-border pt-3 flex justify-between items-baseline">
                       <p className="text-c-white font-medium">Total</p>
                       <span className="font-serif text-3xl font-bold text-c-gold tabular-nums">
                         &euro;{computedTotal}
                       </span>
                     </div>
-                  </div>
-                </div>
-
-                {/* Optional tip slider */}
-                <div className="bg-c-surface border border-c-border p-6 mb-6">
-                  <div className="flex justify-between items-baseline mb-2">
-                    <div>
-                      <p className="text-c-white font-medium text-sm">Add a tip (optional)</p>
-                      <p className="text-c-dim text-xs">
-                        Helps to cover a bit of the costs for us
-                      </p>
-                    </div>
-                    <span className="font-serif text-2xl text-c-gold tabular-nums">
-                      {computedTip > 0 ? `€${computedTip}` : '—'}
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min={0}
-                    max={300}
-                    step={5}
-                    value={computedTip}
-                    onChange={(e) =>
-                      setFormData({ ...formData, tip: parseInt(e.target.value) || 0 })
-                    }
-                    className="w-full h-1.5 rounded-full appearance-none cursor-pointer mt-3"
-                    aria-label="Tip amount"
-                    style={{
-                      background: `linear-gradient(to right, #C9A84C 0%, #C9A84C ${(computedTip / 300) * 100}%, rgba(255,255,255,0.08) ${(computedTip / 300) * 100}%, rgba(255,255,255,0.08) 100%)`,
-                    }}
-                  />
-                  <div className="flex justify-between text-c-dim text-xs mt-2 font-mono">
-                    <span>€0</span>
-                    <span>€150</span>
-                    <span>€300</span>
                   </div>
                 </div>
 
