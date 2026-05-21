@@ -1,5 +1,6 @@
 import { Client } from '@notionhq/client'
 import { NextResponse } from 'next/server'
+import { computeHostQuotas } from '@/lib/host-quota'
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY })
 const GUEST_DS_ID = process.env.NOTION_GUEST_DS_ID!
@@ -17,7 +18,6 @@ const VENUE_PRICES: Record<string, number> = {
   'Self-Provided': 0,
 }
 
-// Reihenfolge im Frontend
 const VENUE_ORDER = [
   'Castle',
   'Gelbes Haus',
@@ -27,15 +27,7 @@ const VENUE_ORDER = [
   'Self-Provided',
 ] as const
 
-// Camping/Self-Provided sind kapazitäts-unbegrenzt
 const UNLIMITED_VENUES = new Set(['Camping', 'Self-Provided'])
-
-// Alias: das Bed-Inventory benutzt teilweise abweichende Venue-Namen.
-// Wir normalisieren beim Einlesen auf die UI-Namen.
-const BED_VENUE_ALIAS: Record<string, string> = {
-  'Deichgraf Elbpension': 'Deichgraf',
-  'Self-Accommodation': 'Self-Provided',
-}
 
 interface VenueStatus {
   name: string
@@ -47,68 +39,19 @@ interface VenueStatus {
 
 export async function GET() {
   try {
-    // 1) Bed Inventory: zähle nur Betten, die noch frei sind.
-    //    Status "Assigned", "Blocked" und "Held" zählen nicht zur freien
-    //    Kapazität, damit manuell zugewiesene Betten nicht doppelt vergeben
-    //    werden können.
-    const totals: Record<string, number> = {}
-    let bedCursor: string | undefined = undefined
-    do {
-      const bedResp: any = await notion.dataSources.query({
-        data_source_id: BED_INVENTORY_DS_ID,
-        start_cursor: bedCursor,
-        page_size: 100,
-      })
-      for (const page of bedResp.results) {
-        if (!('properties' in page)) continue
-        const rawVenue = (page.properties as any)['Venue']?.select?.name
-        if (!rawVenue) continue
-        const status = (page.properties as any)['Status']?.select?.name
-        if (status !== 'Available') continue
-        const venue = BED_VENUE_ALIAS[rawVenue] ?? rawVenue
-        totals[venue] = (totals[venue] || 0) + 1
-      }
-      bedCursor = bedResp.has_more ? bedResp.next_cursor : undefined
-    } while (bedCursor)
-
-    // 2) Gästeliste: zähle nur Gäste, die ein Venue gewählt haben, NICHT
-    //    abgesagt sind, übernachten — UND die noch keinen konkreten Bed Slot
-    //    zugewiesen bekommen haben. Gäste mit Bed Slot Relation haben ihr
-    //    Bett bereits im Inventory belegt (Status != Available), wurden also
-    //    schon aus den totals rausgerechnet. Sie hier nochmal als "taken"
-    //    zu zählen wäre Doppelzählung.
-    const taken: Record<string, number> = {}
-    let guestCursor: string | undefined = undefined
-    do {
-      const guestResp: any = await notion.dataSources.query({
-        data_source_id: GUEST_DS_ID,
-        filter: {
-          and: [
-            { property: 'Status', select: { does_not_equal: 'Abgesagt' } },
-            { property: 'Übernachtung', select: { does_not_equal: 'Nein' } },
-            { property: 'Bed Slot', relation: { is_empty: true } },
-          ],
-        },
-        start_cursor: guestCursor,
-        page_size: 100,
-      })
-      for (const page of guestResp.results) {
-        if (!('properties' in page)) continue
-        const unterkunft = (page.properties as any)['Unterkunft']?.select?.name
-        if (!unterkunft) continue
-        // Legacy-Werte auf neue mappen, damit alte RSVPs mitgezählt werden
-        const normalized =
-          unterkunft === 'Schloss' ? 'Castle' :
-          unterkunft === 'Dorf' ? 'Gelbes Haus' : // Default-Bucket für unspezifisches Dorf
-          unterkunft
-        taken[normalized] = (taken[normalized] || 0) + 1
-      }
-      guestCursor = guestResp.has_more ? guestResp.next_cursor : undefined
-    } while (guestCursor)
+    // Host-Kontingente + Venue-Totals werden zentral im Helper berechnet.
+    // Die Beds-API hängt dann nur noch die Frontend-Form (venues + Compat-Block)
+    // dran. Wenn die Logik woanders (RSVP-Server-Validierung) gebraucht wird,
+    // läuft sie über denselben Helper.
+    const { hosts, totals, taken } = await computeHostQuotas(
+      notion,
+      GUEST_DS_ID,
+      BED_INVENTORY_DS_ID
+    )
 
     const venues: VenueStatus[] = VENUE_ORDER.map((name) => {
       const unlimited = UNLIMITED_VENUES.has(name)
-      const total = unlimited ? null : (totals[name] || 0)
+      const total = unlimited ? null : totals[name] || 0
       const t = taken[name] || 0
       return {
         name,
@@ -140,6 +83,7 @@ export async function GET() {
           taken: villageTaken,
           available: Math.max(0, villageTotal - villageTaken),
         },
+        hosts,
       },
       {
         headers: {
@@ -149,7 +93,8 @@ export async function GET() {
     )
   } catch (error) {
     console.error('Beds query error:', error)
-    // Fallback: Fixwerte, damit die Seite trotzdem rendert
+    // Fallback: Fixwerte, damit die Seite trotzdem rendert. Host-Stats leer →
+    // Frontend behandelt das als "Quota nicht bekannt, keine Sperre".
     const venues: VenueStatus[] = VENUE_ORDER.map((name) => ({
       name,
       price: VENUE_PRICES[name],
@@ -161,6 +106,7 @@ export async function GET() {
       venues,
       castle: { total: 88, taken: 0, available: 88 },
       village: { total: 15, taken: 0, available: 15 },
+      hosts: {},
     })
   }
 }

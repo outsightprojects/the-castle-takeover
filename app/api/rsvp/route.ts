@@ -1,8 +1,10 @@
 import { Client } from '@notionhq/client'
 import { NextRequest, NextResponse } from 'next/server'
+import { computeHostQuotas, HOSTS, type Host } from '@/lib/host-quota'
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY })
 const DATA_SOURCE_ID = process.env.NOTION_GUEST_DS_ID!
+const BED_INVENTORY_DS_ID = process.env.NOTION_BED_INVENTORY_DS_ID!
 
 // ─── Preismodell ──────────────────────────────────────────────────────────
 // Single Source of Truth ist die Notion-Event-Konfiguration. Diese Werte
@@ -134,6 +136,31 @@ export async function POST(request: NextRequest) {
     const venueKey = accommodationPreference as string | undefined
     const venueName = venueKey && VENUE_NAMES[venueKey] ? VENUE_NAMES[venueKey] : 'Noch offen'
     const bedFee = isDayOnly || !venueKey ? 0 : (VENUE_PRICES[venueKey] ?? 0)
+
+    // Server-side Host-Quota-Enforcement: Castle ist pro Host gleichmäßig
+    // verteilt. Wenn der Host des Gastes (= invitedBy) sein Castle-Kontingent
+    // ausgeschöpft hat, blocken wir die Buchung mit klarer Meldung — sonst
+    // könnte das UI-Disable über curl/Postman umgangen werden.
+    // Greift nur für tatsächliche Castle-Buchungen mit Übernachtung.
+    if (!isDayOnly && venueKey === 'castle' && (HOSTS as readonly string[]).includes(invitedBy)) {
+      try {
+        const { hosts } = await computeHostQuotas(notion, DATA_SOURCE_ID, BED_INVENTORY_DS_ID)
+        const stats = hosts[invitedBy as Host]
+        if (stats?.castle_full) {
+          return NextResponse.json(
+            {
+              error: `${invitedBy}’s castle quota is fully booked. Please pick a different venue — we’ll still find you a great place to sleep.`,
+            },
+            { status: 409 }
+          )
+        }
+      } catch (quotaErr) {
+        // Quota-Check fehlgeschlagen → wir lassen die Buchung durch, statt
+        // den Gast wegen eines Notion-Hicksers auszusperren. Manuelle
+        // Nachkontrolle in Notion ist akzeptabel.
+        console.error('Quota check failed, allowing booking through:', quotaErr)
+      }
+    }
 
     // Event Fee: variabel, mindestens 100, maximal 1000 (UI begrenzt auf 300,
     // hier defensiver Hard-Cap gegen Spam/Tippfehler).

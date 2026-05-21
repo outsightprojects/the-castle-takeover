@@ -13,10 +13,22 @@ interface VenueStatus {
   available: number | null
 }
 
+interface HostStats {
+  castle_quota: number
+  castle_used: number
+  castle_available: number
+  castle_full: boolean
+  doubles_quota: number
+  doubles_used: number
+  doubles_available: number
+  doubles_full: boolean
+}
+
 interface BedData {
   venues: VenueStatus[]
   castle?: { total: number; taken: number; available: number }
   village?: { total: number; taken: number; available: number }
+  hosts?: Record<string, HostStats>
 }
 
 interface SubmitResult {
@@ -641,17 +653,37 @@ export default function RSVPPage() {
                       const price = v?.price ?? FALLBACK_PRICES[option.key] ?? 0
                       const available = v?.available
                       const total = v?.total
-                      const isFull =
+                      const inventoryFull =
                         option.hasCapacity &&
                         available !== null &&
                         available !== undefined &&
                         available <= 0
 
-                      const availText = option.hasCapacity
-                        ? available !== null && available !== undefined && total !== null && total !== undefined
-                          ? `${available}/${total}`
+                      // Host-Kontingent für Castle: pro Host nur ein begrenztes
+                      // Castle-Kontingent. Wenn Caris/Peters/Georgs Liste voll
+                      // ist, wird Castle für ihre Gäste ausgegraut. Greift nur
+                      // für die Castle-Option und nur wenn ein Host in Step 2
+                      // gewählt wurde.
+                      const hostStats =
+                        formData.invitedBy && beds?.hosts
+                          ? beds.hosts[formData.invitedBy]
+                          : undefined
+                      const castleHostFull =
+                        option.key === 'castle' && !!hostStats && hostStats.castle_full
+
+                      const isFull = inventoryFull || castleHostFull
+
+                      // Castle bei voller Host-Quota: kein Inventory-Counter
+                      // zeigen — der Disable-Grund kommt aus der Host-Logik,
+                      // nicht aus dem freien Castle-Inventar.
+                      const availText =
+                        castleHostFull
+                          ? null
+                          : option.hasCapacity
+                          ? available !== null && available !== undefined && total !== null && total !== undefined
+                            ? `${available}/${total}`
+                            : null
                           : null
-                        : null
 
                       const priceText: string | null =
                         option.key === 'self'
@@ -700,7 +732,11 @@ export default function RSVPPage() {
                                     selected ? 'text-c-black/60' : 'text-c-dim'
                                   }`}
                                 >
-                                  {isFull ? 'Currently full' : option.desc}
+                                  {castleHostFull
+                                    ? `${formData.invitedBy}’s castle slots are all booked — try a different venue`
+                                    : isFull
+                                    ? 'Currently full'
+                                    : option.desc}
                                 </span>
                                 {priceText && (
                                   <span
@@ -726,15 +762,31 @@ export default function RSVPPage() {
 
                           {/* Inline expand: Castle note */}
                           {showCastleNote && (
-                            <div className="bg-c-surface border border-c-gold/30 p-4 mt-2">
-                              <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-c-gold mb-2">
-                                A note on castle rooms
-                              </p>
-                              <p className="text-c-muted text-xs leading-relaxed">
-                                The castle has a mix of rooms — singles, doubles, shared rooms with a mezzanine, and a dorm.
-                                Not everyone can get a private double; we&apos;ll arrange beds based on the full guest mix
-                                (couples together, friends near each other, etc.) and let you know in good time.
-                              </p>
+                            <div className="bg-c-surface border border-c-gold/30 p-4 mt-2 space-y-3">
+                              <div>
+                                <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-c-gold mb-2">
+                                  A note on castle rooms
+                                </p>
+                                <p className="text-c-muted text-xs leading-relaxed">
+                                  The castle has a mix of rooms — singles, doubles, shared rooms with a mezzanine, and a dorm.
+                                  Not everyone can get a private double; we&apos;ll arrange beds based on the full guest mix
+                                  (couples together, friends near each other, etc.) and let you know in good time.
+                                </p>
+                              </div>
+                              {/* DZ-Kontingent für den gewählten Host voll —
+                                  freundlicher Hinweis, kein Hard-Block. */}
+                              {hostStats && hostStats.doubles_full && (
+                                <div className="border-t border-c-gold/20 pt-3">
+                                  <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-c-gold mb-2">
+                                    Heads up — double rooms
+                                  </p>
+                                  <p className="text-c-muted text-xs leading-relaxed">
+                                    {formData.invitedBy}&rsquo;s double-room quota is fully booked.
+                                    A private double won&apos;t be possible, but we&apos;ll absolutely
+                                    find you a great place to sleep — couples and pairs together where we can.
+                                  </p>
+                                </div>
+                              )}
                             </div>
                           )}
 
