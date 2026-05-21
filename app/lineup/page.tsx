@@ -93,6 +93,10 @@ export default function LineupPage() {
             hear — chillout, peak-hour, sunrise, whatever. The DJs use it for
             inspiration; we use it to warm up.
           </p>
+          <p className="text-c-gold/90 text-sm italic leading-relaxed max-w-lg mx-auto mt-5">
+            Heads up: as long as the lineup is empty, this playlist is
+            basically running the party. Please drop some tracks :D
+          </p>
         </div>
 
         <div className="border border-c-border p-2">
