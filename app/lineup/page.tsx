@@ -4,7 +4,7 @@ import { Sunrise, Sun, Moon, Music2 } from 'lucide-react'
 export const metadata = {
   title: 'Lineup — The Castle Takeover',
   description:
-    'The full lineup is being shaped — DJs, sets, slots. Drop in your favourite tracks while we cook the timetable.',
+    'The DJ lineup is still being shaped. While we book it, drop your tracks into the shared playlist — that is what the DJs will draw from.',
 }
 
 interface Slot {
@@ -70,9 +70,57 @@ export default function LineupPage() {
           <span className="block italic text-c-gold">Lineup</span>
         </h1>
         <p className="text-c-muted text-lg leading-relaxed max-w-xl mx-auto">
-          A rough sketch of where music lands across the weekend. Slots are
-          empty for now — we&rsquo;ll fill them with names and faces closer
-          to the event.
+          The DJ lineup is still being shaped — names and slots are coming.
+          While we book it, drop your tracks into the shared playlist below.
+          That&rsquo;s where the DJs will draw from.
+        </p>
+      </section>
+
+      <div className="rule" />
+
+      {/* Spotify playlist — pulled to the top so we collect requests
+          before the DJ lineup is finalised. */}
+      <section className="px-6 md:px-8 py-16 md:py-24 max-w-3xl mx-auto">
+        <div className="text-center mb-8">
+          <p className="font-mono text-[11px] tracking-[0.3em] uppercase text-c-gold mb-4">
+            Step one
+          </p>
+          <h2 className="font-serif text-3xl md:text-4xl font-bold text-c-white mb-4">
+            Drop your tracks
+          </h2>
+          <p className="text-c-muted text-sm leading-relaxed max-w-lg mx-auto">
+            A shared playlist for the weekend. Add the songs you want to
+            hear — chillout, peak-hour, sunrise, whatever. The DJs use it for
+            inspiration; we use it to warm up.
+          </p>
+        </div>
+
+        <div className="border border-c-border p-2">
+          <iframe
+            data-testid="embed-iframe"
+            style={{ borderRadius: 12 }}
+            src="https://open.spotify.com/embed/playlist/2HaleMU3pAfnBgP0Gx0V3U?utm_source=generator&theme=0"
+            width="100%"
+            height="352"
+            frameBorder={0}
+            allowFullScreen
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy"
+            title="The Castle Takeover — shared playlist"
+          />
+        </div>
+
+        <p className="text-c-dim text-xs text-center mt-6">
+          Don&rsquo;t see the playlist? Open it directly{' '}
+          <a
+            href="https://open.spotify.com/playlist/2HaleMU3pAfnBgP0Gx0V3U?si=77a5c842e09c41c2&pt=2745ee67ab09e31c3c98ae80e75dbe3f"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-c-gold hover:text-c-gold-light underline underline-offset-4"
+          >
+            on Spotify
+          </a>
+          .
         </p>
       </section>
 
@@ -156,53 +204,6 @@ export default function LineupPage() {
             Reach out via WhatsApp
           </a>
         </div>
-      </section>
-
-      <div className="rule" />
-
-      {/* Spotify playlist */}
-      <section className="px-6 md:px-8 py-16 md:py-24 max-w-3xl mx-auto">
-        <div className="text-center mb-8">
-          <p className="font-mono text-[11px] tracking-[0.3em] uppercase text-c-gold mb-4">
-            In the meantime
-          </p>
-          <h2 className="font-serif text-3xl md:text-4xl font-bold text-c-white mb-4">
-            Drop your tracks
-          </h2>
-          <p className="text-c-muted text-sm leading-relaxed max-w-lg mx-auto">
-            A shared playlist for the weekend. Add the songs you want to
-            hear — chillout, peak-hour, sunrise, whatever. The DJs use it for
-            inspiration; we use it to warm up.
-          </p>
-        </div>
-
-        <div className="border border-c-border p-2">
-          <iframe
-            data-testid="embed-iframe"
-            style={{ borderRadius: 12 }}
-            src="https://open.spotify.com/embed/playlist/2HaleMU3pAfnBgP0Gx0V3U?utm_source=generator&theme=0"
-            width="100%"
-            height="352"
-            frameBorder={0}
-            allowFullScreen
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            loading="lazy"
-            title="The Castle Takeover — shared playlist"
-          />
-        </div>
-
-        <p className="text-c-dim text-xs text-center mt-6">
-          Don&rsquo;t see the playlist? Open it directly{' '}
-          <a
-            href="https://open.spotify.com/playlist/2HaleMU3pAfnBgP0Gx0V3U?si=77a5c842e09c41c2&pt=2745ee67ab09e31c3c98ae80e75dbe3f"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-c-gold hover:text-c-gold-light underline underline-offset-4"
-          >
-            on Spotify
-          </a>
-          .
-        </p>
       </section>
     </PageShell>
   )
