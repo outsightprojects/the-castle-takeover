@@ -68,6 +68,21 @@ function mapTransport(mode: string): string {
   }
 }
 
+// Frontend-Key → Notion-Select-Option für "Ankunftstag".
+// Werte aus tickets-page.tsx: 'friday' | 'saturday' | 'unsure-arrival'
+function mapArrivalDay(arrivalDay: string | undefined): string | null {
+  switch (arrivalDay) {
+    case 'friday':
+      return 'Freitag'
+    case 'saturday':
+      return 'Samstag'
+    case 'unsure-arrival':
+      return 'Noch unklar'
+    default:
+      return null
+  }
+}
+
 // Frontend-Key → Notion-Select-Option für "Bett-Typ".
 // Nur relevant für Pensionen (gelbeshaus/schlosskrug/deichgraf).
 function mapBedType(bedType: string | undefined): string | null {
@@ -128,13 +143,15 @@ export async function POST(request: NextRequest) {
     )
 
     // Properties für Notion zusammenbauen
+    // Kontakt-Feld: nur Email. Telefon hat ein eigenes phone_number-Feld
+    // in Notion und wird dort separat eingetragen (siehe unten).
     const properties: Record<string, unknown> = {
       'Name': { title: [{ text: { content: name } }] },
       'Host': { select: { name: invitedBy } },
       'Status': { select: { name: mapAttendance(attendance) } },
       'Kontakt': {
         rich_text: [
-          { text: { content: [email, phone].filter(Boolean).join(' | ') } },
+          { text: { content: email } },
         ],
       },
       // Preisfelder: Event Fee variabel (min 100), Bed Fee abhängig vom Venue.
@@ -145,6 +162,21 @@ export async function POST(request: NextRequest) {
       'Tip €': { number: 0 },
       'Helfer': { checkbox: willingToHelp || false },
       'Shuttle': { checkbox: needsShuttle || false },
+    }
+
+    // Telefon: eigenes phone_number-Feld in Notion. Nur setzen, wenn der
+    // Gast wirklich eine Nummer angegeben hat (sonst wirft Notion einen
+    // Validierungsfehler für leere Strings).
+    if (phone && String(phone).trim()) {
+      properties['Telefon'] = { phone_number: String(phone).trim() }
+    }
+
+    // Ankunftstag: dediziertes Select-Feld in Notion (Freitag/Samstag/Noch unklar).
+    // Fallback: wenn das Mapping null liefert (unerwarteter Wert), bleibt das
+    // Feld leer und der Rohwert wandert in die Notizen, damit nichts verloren geht.
+    const arrivalDayName = mapArrivalDay(arrivalDay)
+    if (arrivalDayName) {
+      properties['Ankunftstag'] = { select: { name: arrivalDayName } }
     }
 
     if (isDayOnly) {
@@ -178,8 +210,14 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Notizen: freier Text vom Gast. Ankunftstag wird NICHT mehr hier
+    // mitgeschrieben (eigenes Select-Feld "Ankunftstag"). Falls das Mapping
+    // einen unbekannten arrivalDay-Wert nicht erkennt, kommt der Rohwert
+    // als Fallback hier rein, damit nichts verloren geht.
     const noteParts: string[] = []
-    if (arrivalDay) noteParts.push(`Anreise: ${arrivalDay}`)
+    if (arrivalDay && !arrivalDayName) {
+      noteParts.push(`Ankunftstag (unmapped): ${arrivalDay}`)
+    }
     if (notes) noteParts.push(notes)
     if (noteParts.length > 0) {
       properties['Notizen'] = {
