@@ -1013,9 +1013,10 @@ export default function RSVPPage() {
                     A small note
                   </p>
                   <p className="text-c-muted text-sm leading-relaxed">
-                    Anything you add above the &euro;{EVENT_FEE_MIN} base is a birthday gift
-                    to Cari, Peter &amp; Georg — we&rsquo;d be more than happy about it.
-                    No pressure though, &euro;{EVENT_FEE_MIN} is completely fine.
+                    Anything you add above the &euro;{EVENT_FEE_MIN} base fee for the event
+                    you can see as a birthday gift to Cari, Peter &amp; Georg — we&rsquo;d be
+                    more than happy about it. No pressure though, &euro;{EVENT_FEE_MIN} is
+                    completely fine.
                   </p>
                 </div>
 
