@@ -95,13 +95,13 @@ const ACCOMMODATION_OPTIONS: Array<{
         key: 'double-shared',
         apiName: 'Doppelbett-Slot',
         label: 'Half of a shared double bed',
-        desc: "You'll share a double bed with one other guest (couple, friend, or we'll match you).",
+        desc: "You and one other guest share a double bed. Price is per person — two of you = €150 total (€75 × 2).",
       },
       {
         key: 'single',
         apiName: 'Einzelbett',
         label: 'Single bed (in the 5-person room)',
-        desc: 'Your own single bed inside the shared 5-person room. Only one of these in the whole house.',
+        desc: 'Your own single bed inside the shared 5-person room. Only one of these in the whole house. Price is per person.',
       },
     ],
   },
@@ -118,7 +118,7 @@ const ACCOMMODATION_OPTIONS: Array<{
         key: 'double-shared',
         apiName: 'Doppelbett-Slot',
         label: 'Half of a shared double bed, in a double room',
-        desc: "You'll share a double bed with one other guest (couple, friend, or we'll match you).",
+        desc: "You and one other guest share a double bed. Price is per person — two of you = €100 total (€50 × 2).",
       },
     ],
   },
@@ -135,7 +135,7 @@ const ACCOMMODATION_OPTIONS: Array<{
         key: 'double-shared',
         apiName: 'Doppelbett-Slot',
         label: 'Half of a shared double bed, in a double room',
-        desc: "You'll share a double bed with one other guest (couple, friend, or we'll match you).",
+        desc: "You and one other guest share a double bed. Price is per person — two of you = €246 total (€123 × 2).",
       },
     ],
   },
@@ -392,6 +392,11 @@ export default function RSVPPage() {
                     &euro;{submitResult.total}
                   </span>
                 </div>
+                <p className="text-c-dim text-xs leading-relaxed pt-2">
+                  This is your personal total. If you&rsquo;re coming with a
+                  partner, they&rsquo;ll get their own total when they submit
+                  their RSVP.
+                </p>
               </div>
 
               <div className="border-t border-c-border pt-6">
@@ -690,7 +695,7 @@ export default function RSVPPage() {
                           ? null
                           : price === 0
                           ? 'No bed cost'
-                          : `€${price} per bed · whole weekend`
+                          : `€${price} per person · whole weekend`
                       const selected = formData.accommodationPreference === option.key
                       const showCastleNote = selected && option.key === 'castle'
                       const showBedTypePicker = selected && !!option.bedTypes
@@ -990,7 +995,7 @@ export default function RSVPPage() {
                           <p className="text-c-dim text-xs">
                             {computedBedFee === 0
                               ? 'Free'
-                              : '1 bed · whole weekend'}
+                              : 'Per person · whole weekend'}
                           </p>
                         </div>
                         <span className="font-serif text-xl text-c-white tabular-nums">
@@ -1013,10 +1018,14 @@ export default function RSVPPage() {
                     A small note
                   </p>
                   <p className="text-c-muted text-sm leading-relaxed">
-                    Anything you add above the &euro;{EVENT_FEE_MIN} base fee for the event
-                    you can see as a birthday gift to Cari, Peter &amp; Georg — we&rsquo;d be
-                    more than happy about it. No pressure though, &euro;{EVENT_FEE_MIN} is
-                    completely fine.
+                    Heads up: both fees are <span className="text-c-white font-medium">per person</span>.
+                    Coming as a couple? Each of you signs up separately and each pays
+                    event fee + bed fee.
+                  </p>
+                  <p className="text-c-muted text-sm leading-relaxed mt-3">
+                    Anything you add above the &euro;{EVENT_FEE_MIN} base event fee is a birthday
+                    gift to Cari, Peter &amp; Georg — we&rsquo;d be more than happy about it.
+                    No pressure though, &euro;{EVENT_FEE_MIN} is completely fine.
                   </p>
                 </div>
 

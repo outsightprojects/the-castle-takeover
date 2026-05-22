@@ -223,7 +223,7 @@ export default function AboutPage() {
           />
           <FAQItem
             question="Where do I sleep?"
-            answer="Six options in the RSVP. Castle (~90 beds, &euro;90 — mostly shared rooms with some doubles, we assign based on the full guest mix). Gelbes Haus (&euro;75) and Schlosskrug (&euro;50) are houses we've reserved in the village, ~5 min from the castle. Deichgraf (&euro;123) is a pension nearby. Camping on the grounds is free. Self-arranged means you sort out your own bed (hotel, friend's place, Airbnb) and just pay the event fee. All bed prices are for the whole weekend."
+            answer="Six options in the RSVP. Castle (~90 beds, &euro;90 per person — mostly shared rooms with some doubles, we assign based on the full guest mix). Gelbes Haus (&euro;75 per person) and Schlosskrug (&euro;50 per person) are houses we've reserved in the village, ~5 min from the castle. Deichgraf (&euro;123 per person) is a pension nearby. Camping on the grounds is free. Self-arranged means you sort out your own bed (hotel, friend's place, Airbnb) and just pay the event fee. All prices are per person, for the whole weekend — couples each pay individually."
           />
         </div>
       </section>

@@ -327,7 +327,8 @@ export default function VenuePage() {
 
         <p className="text-c-muted text-sm leading-relaxed text-center max-w-xl mx-auto mb-10">
           We&rsquo;ve reserved beds in four places. Pick one in the RSVP &mdash;
-          bed prices below are for the whole weekend, on top of the &euro;100 event fee.
+          all prices are <span className="text-c-white">per person</span> for the whole
+          weekend, on top of the &euro;100 event fee. Couples each pay individually.
         </p>
 
         <div className="space-y-0">
@@ -336,25 +337,25 @@ export default function VenuePage() {
               icon: BedDouble,
               title: 'In the Castle',
               desc: 'Around 90 beds — mostly shared rooms, some doubles, a few singles. We assign based on the full guest mix.',
-              tag: '€90',
+              tag: '€90 pp',
             },
             {
               icon: Home,
               title: 'Gelbes Haus',
               desc: 'Village house, ~5 min from the castle. A 5-person room (two shared double beds + one single bed) plus a double room with a shared double bed.',
-              tag: '€75',
+              tag: '€75 pp',
             },
             {
               icon: Home,
               title: 'Schlosskrug',
               desc: 'Village inn, ~5 min from the castle. Two double rooms, each with one shared double bed — perfect for a couple or close friends.',
-              tag: '€50',
+              tag: '€50 pp',
             },
             {
               icon: Home,
               title: 'Deichgraf Elbpension',
               desc: 'Premium pension nearby, ~5 min from the castle. Two double rooms, each with one shared double bed.',
-              tag: '€123',
+              tag: '€123 pp',
             },
             {
               icon: Tent,
