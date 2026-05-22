@@ -188,7 +188,10 @@ export async function POST(request: NextRequest) {
       'Bed Fee €': { number: bedFee },
       'Tip €': { number: 0 },
       'Helfer': { checkbox: willingToHelp || false },
-      'Shuttle': { checkbox: needsShuttle || false },
+      // Shuttle hat (aktuell) KEINE eigene Notion-Spalte. Wenn der Gast einen
+      // Shuttle braucht, landet die Info weiter unten als Hinweis in Notizen.
+      // Würden wir hier eine 'Shuttle'-Property setzen, schmiert der ganze
+      // RSVP-Submit mit 'property not found' ab — siehe Bug Mai 2026.
     }
 
     // Telefon: eigenes phone_number-Feld in Notion. Nur setzen, wenn der
@@ -244,6 +247,9 @@ export async function POST(request: NextRequest) {
     const noteParts: string[] = []
     if (arrivalDay && !arrivalDayName) {
       noteParts.push(`Ankunftstag (unmapped): ${arrivalDay}`)
+    }
+    if (needsShuttle) {
+      noteParts.push('Shuttle gewünscht')
     }
     if (notes) noteParts.push(notes)
     if (noteParts.length > 0) {
