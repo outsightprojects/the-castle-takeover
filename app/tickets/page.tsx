@@ -145,7 +145,7 @@ const CALENDAR_LOCATION = 'Schloss Dornburg, Lindenweg 1, 39264 Gommern, Germany
 const CALENDAR_DESC = "Peter, Cari & Georg's joint birthday weekend. Castle. Party. Weekend. thecastletakeover.de"
 
 const PAYPAL_POOL_URL = 'https://www.paypal.com/pool/9nZT9mha8K?sr=wccr'
-const WHATSAPP_GROUP_URL = 'https://chat.whatsapp.com/LutHT3B7hv00hRN2z41MmC'
+const WHATSAPP_GROUP_URL = 'https://chat.whatsapp.com/Equty3W3fHiCkl1LUYsIgu'
 
 export default function RSVPPage() {
   const [step, setStep] = useState(1)

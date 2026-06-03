@@ -200,7 +200,7 @@ export default function LineupPage() {
             afternoon by the lake or a peak-hour cellar moment.
           </p>
           <a
-            href="https://chat.whatsapp.com/LutHT3B7hv00hRN2z41MmC"
+            href="https://chat.whatsapp.com/Equty3W3fHiCkl1LUYsIgu"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 bg-c-gold text-c-black font-semibold px-8 py-3 text-sm tracking-widest uppercase hover:bg-c-gold-light active:scale-[0.98] transition-all min-h-[48px]"
