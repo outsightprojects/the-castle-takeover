@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Playfair_Display, JetBrains_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react'
+import { RsvpDeadlineBanner } from '@/components/rsvp-deadline-banner'
 import './globals.css'
 
 const inter = Inter({
@@ -43,6 +44,7 @@ export default function RootLayout({
       className={`${inter.variable} ${playfair.variable} ${jetbrains.variable}`}
     >
       <body className="min-h-dvh bg-c-black text-c-white grain">
+        <RsvpDeadlineBanner />
         {children}
         <Analytics />
       </body>

@@ -3,6 +3,12 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { PageShell } from '@/components/page-shell'
+import {
+  getDeadlineState,
+  deadlineSubmitButtonCopy,
+  GEORG_WHATSAPP_URL,
+  GEORG_WHATSAPP_DISPLAY,
+} from '@/lib/rsvp-deadline'
 
 // ─── Types ────────────────────────────────────────────────────────────────
 interface VenueStatus {
@@ -13,22 +19,10 @@ interface VenueStatus {
   available: number | null
 }
 
-interface HostStats {
-  castle_quota: number
-  castle_used: number
-  castle_available: number
-  castle_full: boolean
-  doubles_quota: number
-  doubles_used: number
-  doubles_available: number
-  doubles_full: boolean
-}
-
 interface BedData {
   venues: VenueStatus[]
   castle?: { total: number; taken: number; available: number }
   village?: { total: number; taken: number; available: number }
-  hosts?: Record<string, HostStats>
 }
 
 interface SubmitResult {
@@ -95,13 +89,13 @@ const ACCOMMODATION_OPTIONS: Array<{
         key: 'double-shared',
         apiName: 'Doppelbett-Slot',
         label: 'Half of a shared double bed',
-        desc: "You and one other guest share a double bed. Price is per person — two of you = €150 total (€75 × 2).",
+        desc: "You'll share a double bed with one other guest (couple, friend, or we'll match you).",
       },
       {
         key: 'single',
         apiName: 'Einzelbett',
         label: 'Single bed (in the 5-person room)',
-        desc: 'Your own single bed inside the shared 5-person room. Only one of these in the whole house. Price is per person.',
+        desc: 'Your own single bed inside the shared 5-person room. Only one of these in the whole house.',
       },
     ],
   },
@@ -118,7 +112,7 @@ const ACCOMMODATION_OPTIONS: Array<{
         key: 'double-shared',
         apiName: 'Doppelbett-Slot',
         label: 'Half of a shared double bed, in a double room',
-        desc: "You and one other guest share a double bed. Price is per person — two of you = €100 total (€50 × 2).",
+        desc: "You'll share a double bed with one other guest (couple, friend, or we'll match you).",
       },
     ],
   },
@@ -135,7 +129,7 @@ const ACCOMMODATION_OPTIONS: Array<{
         key: 'double-shared',
         apiName: 'Doppelbett-Slot',
         label: 'Half of a shared double bed, in a double room',
-        desc: "You and one other guest share a double bed. Price is per person — two of you = €246 total (€123 × 2).",
+        desc: "You'll share a double bed with one other guest (couple, friend, or we'll match you).",
       },
     ],
   },
@@ -160,6 +154,13 @@ export default function RSVPPage() {
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [submitResult, setSubmitResult] = useState<SubmitResult | null>(null)
   const [beds, setBeds] = useState<BedData | null>(null)
+
+  // Phase comes from a single helper so all surfaces stay consistent. Soft
+  // deadline: form still works after July 1, but we surface a clearer
+  // "contact Georg" affordance so we can keep catering planning sane.
+  const deadline = getDeadlineState()
+  const deadlinePastOrLast =
+    deadline.phase === 'last-call' || deadline.phase === 'closed-soft'
 
   const [formData, setFormData] = useState({
     attendance: '',
@@ -323,9 +324,23 @@ export default function RSVPPage() {
             <h2 className="font-serif text-3xl md:text-4xl font-bold text-c-white mb-4">
               You&apos;re in.
             </h2>
-            <p className="text-c-muted text-lg mb-8">
+            <p className="text-c-muted text-lg mb-3">
               Thank you, {formData.name}. See you at Schloss Dornburg.
             </p>
+            {deadline.phase !== 'closed-soft' && deadline.daysLeft >= 0 && (
+              <p className="text-c-gold/80 text-sm mb-8 font-mono tracking-wide">
+                {deadline.daysLeft === 0
+                  ? 'Made it on the very last day — thanks for closing the loop.'
+                  : deadline.daysLeft <= 2
+                  ? `Last-minute, but counted. Thanks for closing the loop.`
+                  : `In with ${deadline.daysLeft} days to spare — thanks for not making us chase you.`}
+              </p>
+            )}
+            {deadline.phase === 'closed-soft' && (
+              <p className="text-c-gold/80 text-sm mb-8 font-mono tracking-wide">
+                Past the official deadline — we&rsquo;ll squeeze you in. Georg will be in touch.
+              </p>
+            )}
 
             {formData.willingToHelp && (
               <p className="text-c-gold text-sm mb-6">
@@ -392,11 +407,6 @@ export default function RSVPPage() {
                     &euro;{submitResult.total}
                   </span>
                 </div>
-                <p className="text-c-dim text-xs leading-relaxed pt-2">
-                  This is your personal total. If you&rsquo;re coming with a
-                  partner, they&rsquo;ll get their own total when they submit
-                  their RSVP.
-                </p>
               </div>
 
               <div className="border-t border-c-border pt-6">
@@ -468,6 +478,76 @@ export default function RSVPPage() {
             Not just a party — a shared weekend with friends old and new.
           </p>
         </div>
+
+        {/* Deadline card — phase-aware. 'info' is the calm default; */}
+        {/* 'gentle' and 'last-call' escalate visually; 'closed-soft' */}
+        {/* swaps to a fallback contact card while keeping the form open. */}
+        {deadline.phase !== 'closed-soft' ? (
+          <div
+            className={`mb-8 p-5 border ${
+              deadline.phase === 'last-call'
+                ? 'border-c-gold bg-c-gold/[0.06]'
+                : deadline.phase === 'gentle'
+                ? 'border-c-gold/40 bg-c-gold/[0.03]'
+                : 'border-c-border bg-c-surface'
+            }`}
+          >
+            <div className="flex items-start gap-4">
+              <div className="flex-1">
+                <p
+                  className={`font-mono text-[10px] tracking-[0.3em] uppercase mb-2 ${
+                    deadlinePastOrLast ? 'text-c-gold' : 'text-c-gold/70'
+                  }`}
+                >
+                  {deadline.phase === 'last-call'
+                    ? 'Last Call'
+                    : deadline.phase === 'gentle'
+                    ? 'RSVP Closing Soon'
+                    : 'RSVP Deadline'}
+                </p>
+                <p className="text-c-white text-sm leading-relaxed">
+                  Please RSVP by{' '}
+                  <span className="text-c-gold font-medium">
+                    {deadline.deadlineLabel}
+                  </span>
+                  {deadline.daysLeft >= 0 && deadline.daysLeft <= 14 && (
+                    <span className="text-c-muted">
+                      {' '}
+                      ({deadline.daysLeft === 0
+                        ? 'today'
+                        : deadline.daysLeft === 1
+                        ? '1 day to go'
+                        : `${deadline.daysLeft} days to go`}
+                      )
+                    </span>
+                  )}
+                  . We need to finalise bed assignments and catering with the
+                  castle and the village houses.
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="mb-8 p-5 border border-c-gold/40 bg-c-surface">
+            <p className="font-mono text-[10px] tracking-[0.3em] uppercase text-c-gold mb-2">
+              Past the deadline
+            </p>
+            <p className="text-c-white text-sm leading-relaxed mb-4">
+              The official RSVP window closed on {deadline.deadlineLabel}. You
+              can still fill in the form below — we&rsquo;ll try to fit you in
+              — but please message Georg directly so we can confirm beds and
+              catering.
+            </p>
+            <a
+              href={GEORG_WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 bg-[#25D366] text-white font-semibold px-5 py-3 text-xs tracking-widest uppercase hover:bg-[#20BD5A] active:scale-[0.98] transition-all min-h-[44px]"
+            >
+              WhatsApp Georg · {GEORG_WHATSAPP_DISPLAY}
+            </a>
+          </div>
+        )}
 
         {/* Progress */}
         <div className="flex items-center justify-center gap-2 mb-10">
@@ -658,44 +738,24 @@ export default function RSVPPage() {
                       const price = v?.price ?? FALLBACK_PRICES[option.key] ?? 0
                       const available = v?.available
                       const total = v?.total
-                      const inventoryFull =
+                      const isFull =
                         option.hasCapacity &&
                         available !== null &&
                         available !== undefined &&
                         available <= 0
 
-                      // Host-Kontingent für Castle: pro Host nur ein begrenztes
-                      // Castle-Kontingent. Wenn Caris/Peters/Georgs Liste voll
-                      // ist, wird Castle für ihre Gäste ausgegraut. Greift nur
-                      // für die Castle-Option und nur wenn ein Host in Step 2
-                      // gewählt wurde.
-                      const hostStats =
-                        formData.invitedBy && beds?.hosts
-                          ? beds.hosts[formData.invitedBy]
-                          : undefined
-                      const castleHostFull =
-                        option.key === 'castle' && !!hostStats && hostStats.castle_full
-
-                      const isFull = inventoryFull || castleHostFull
-
-                      // Castle bei voller Host-Quota: kein Inventory-Counter
-                      // zeigen — der Disable-Grund kommt aus der Host-Logik,
-                      // nicht aus dem freien Castle-Inventar.
-                      const availText =
-                        castleHostFull
-                          ? null
-                          : option.hasCapacity
-                          ? available !== null && available !== undefined && total !== null && total !== undefined
-                            ? `${available}/${total}`
-                            : null
+                      const availText = option.hasCapacity
+                        ? available !== null && available !== undefined && total !== null && total !== undefined
+                          ? `${available}/${total}`
                           : null
+                        : null
 
                       const priceText: string | null =
                         option.key === 'self'
                           ? null
                           : price === 0
                           ? 'No bed cost'
-                          : `€${price} per person · whole weekend`
+                          : `€${price} per bed · whole weekend`
                       const selected = formData.accommodationPreference === option.key
                       const showCastleNote = selected && option.key === 'castle'
                       const showBedTypePicker = selected && !!option.bedTypes
@@ -737,11 +797,7 @@ export default function RSVPPage() {
                                     selected ? 'text-c-black/60' : 'text-c-dim'
                                   }`}
                                 >
-                                  {castleHostFull
-                                    ? `${formData.invitedBy}’s castle slots are all booked — try a different venue`
-                                    : isFull
-                                    ? 'Currently full'
-                                    : option.desc}
+                                  {isFull ? 'Currently full' : option.desc}
                                 </span>
                                 {priceText && (
                                   <span
@@ -767,31 +823,15 @@ export default function RSVPPage() {
 
                           {/* Inline expand: Castle note */}
                           {showCastleNote && (
-                            <div className="bg-c-surface border border-c-gold/30 p-4 mt-2 space-y-3">
-                              <div>
-                                <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-c-gold mb-2">
-                                  A note on castle rooms
-                                </p>
-                                <p className="text-c-muted text-xs leading-relaxed">
-                                  The castle has a mix of rooms — singles, doubles, shared rooms with a mezzanine, and a dorm.
-                                  Not everyone can get a private double; we&apos;ll arrange beds based on the full guest mix
-                                  (couples together, friends near each other, etc.) and let you know in good time.
-                                </p>
-                              </div>
-                              {/* DZ-Kontingent für den gewählten Host voll —
-                                  freundlicher Hinweis, kein Hard-Block. */}
-                              {hostStats && hostStats.doubles_full && (
-                                <div className="border-t border-c-gold/20 pt-3">
-                                  <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-c-gold mb-2">
-                                    Heads up — double rooms
-                                  </p>
-                                  <p className="text-c-muted text-xs leading-relaxed">
-                                    {formData.invitedBy}&rsquo;s double-room quota is fully booked.
-                                    A private double won&apos;t be possible, but we&apos;ll absolutely
-                                    find you a great place to sleep — couples and pairs together where we can.
-                                  </p>
-                                </div>
-                              )}
+                            <div className="bg-c-surface border border-c-gold/30 p-4 mt-2">
+                              <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-c-gold mb-2">
+                                A note on castle rooms
+                              </p>
+                              <p className="text-c-muted text-xs leading-relaxed">
+                                The castle has a mix of rooms — singles, doubles, shared rooms with a mezzanine, and a dorm.
+                                Not everyone can get a private double; we&apos;ll arrange beds based on the full guest mix
+                                (couples together, friends near each other, etc.) and let you know in good time.
+                              </p>
                             </div>
                           )}
 
@@ -995,7 +1035,7 @@ export default function RSVPPage() {
                           <p className="text-c-dim text-xs">
                             {computedBedFee === 0
                               ? 'Free'
-                              : 'Per person · whole weekend'}
+                              : '1 bed · whole weekend'}
                           </p>
                         </div>
                         <span className="font-serif text-xl text-c-white tabular-nums">
@@ -1018,13 +1058,8 @@ export default function RSVPPage() {
                     A small note
                   </p>
                   <p className="text-c-muted text-sm leading-relaxed">
-                    Heads up: both fees are <span className="text-c-white font-medium">per person</span>.
-                    Coming as a couple? Each of you signs up separately and each pays
-                    event fee + bed fee.
-                  </p>
-                  <p className="text-c-muted text-sm leading-relaxed mt-3">
-                    Anything you add above the &euro;{EVENT_FEE_MIN} base event fee is a birthday
-                    gift to Cari, Peter &amp; Georg — we&rsquo;d be more than happy about it.
+                    Anything you add above the &euro;{EVENT_FEE_MIN} base is a birthday gift
+                    to Cari, Peter &amp; Georg — we&rsquo;d be more than happy about it.
                     No pressure though, &euro;{EVENT_FEE_MIN} is completely fine.
                   </p>
                 </div>
@@ -1158,7 +1193,7 @@ export default function RSVPPage() {
                   disabled={!canProceed() || isSubmitting}
                   className="bg-c-gold text-c-black font-semibold px-8 py-3 text-sm tracking-widest uppercase hover:bg-c-gold-light active:scale-[0.98] transition-all disabled:opacity-30 disabled:cursor-not-allowed min-h-[48px]"
                 >
-                  {isSubmitting ? 'Submitting...' : 'Count me in'}
+                  {isSubmitting ? 'Submitting...' : deadlineSubmitButtonCopy(deadline)}
                 </button>
               )}
             </div>

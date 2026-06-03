@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { VideoHero } from '@/components/video-hero'
 import { Countdown } from '@/components/countdown'
+import { getDeadlineState, deadlineHeroLine } from '@/lib/rsvp-deadline'
 import {
   ArrowRight,
   Music,
@@ -26,6 +27,13 @@ export function HomeContent({ guestName }: { guestName?: string }) {
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
     .join(' ')
 
+  // Deadline state — drives the small line under the hero date, the practical
+  // section, and the final CTA. Single source of truth: lib/rsvp-deadline.ts.
+  const deadline = getDeadlineState()
+  const deadlineLine = deadlineHeroLine(deadline)
+  const deadlineEmphasis =
+    deadline.phase === 'last-call' || deadline.phase === 'closed-soft'
+
   return (
     <>
       {/* ── Hero ── */}
@@ -35,8 +43,15 @@ export function HomeContent({ guestName }: { guestName?: string }) {
       >
         <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-c-gold/8 to-transparent z-[1]" />
         <div className="px-6 md:px-8 pt-16 pb-24 md:pt-28 md:pb-40 max-w-5xl mx-auto text-center">
-          <p className="font-mono text-[11px] md:text-xs tracking-[0.3em] uppercase text-c-gold/80 mb-8">
+          <p className="font-mono text-[11px] md:text-xs tracking-[0.3em] uppercase text-c-gold/80 mb-3">
             28.08 &mdash; 30.08.2026 &middot; Schloss Dornburg
+          </p>
+          <p
+            className={`font-mono text-[10px] md:text-[11px] tracking-[0.25em] uppercase mb-8 ${
+              deadlineEmphasis ? 'text-c-gold' : 'text-c-white/55'
+            }`}
+          >
+            {deadlineLine}
           </p>
 
           {isInvitation && (
@@ -273,9 +288,18 @@ export function HomeContent({ guestName }: { guestName?: string }) {
             RSVP takes about 2 minutes. You pick your arrival day,
             where you want to sleep, and any dietary notes. That&rsquo;s it.
           </p>
+          <p
+            className={`font-mono text-[11px] tracking-[0.25em] uppercase mt-6 ${
+              deadlineEmphasis ? 'text-c-gold' : 'text-c-white/60'
+            }`}
+          >
+            {deadline.phase === 'closed-soft'
+              ? 'RSVP window closed — message Georg directly'
+              : `Please RSVP by ${deadline.deadlineLabel} so we can finalise beds & catering`}
+          </p>
           <Link
             href="/tickets"
-            className="group inline-flex items-center justify-center gap-2 bg-c-gold text-c-black font-semibold px-10 py-4 rounded-none text-sm tracking-widest uppercase hover:bg-c-gold-light active:scale-[0.98] transition-all min-h-[48px] mt-10"
+            className="group inline-flex items-center justify-center gap-2 bg-c-gold text-c-black font-semibold px-10 py-4 rounded-none text-sm tracking-widest uppercase hover:bg-c-gold-light active:scale-[0.98] transition-all min-h-[48px] mt-8"
           >
             RSVP
             <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
@@ -298,8 +322,15 @@ export function HomeContent({ guestName }: { guestName?: string }) {
               : <>See you at the castle.</>
             }
           </h2>
-          <p className="text-c-muted text-lg mb-12 max-w-md mx-auto">
+          <p className="text-c-muted text-lg mb-4 max-w-md mx-auto">
             Spots are limited. Don&rsquo;t be the one who missed it.
+          </p>
+          <p
+            className={`font-mono text-[11px] tracking-[0.25em] uppercase mb-12 ${
+              deadlineEmphasis ? 'text-c-gold' : 'text-c-gold/60'
+            }`}
+          >
+            {deadlineLine}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
