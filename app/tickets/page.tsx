@@ -434,6 +434,24 @@ export default function RSVPPage() {
                 <p className="text-c-dim text-xs mt-4">
                   Include your name in the payment note so we can match it up.
                 </p>
+                {/* Anonymous-payment warning. PayPal Money Pools let senders */}
+                {/* hide their name; without a heads-up we can't match the */}
+                {/* payment to the RSVP and you might get chased for it. */}
+                <div className="bg-c-gold/[0.06] border border-c-gold/30 p-3 mt-3 text-left">
+                  <p className="text-c-gold font-mono text-[10px] tracking-[0.25em] uppercase mb-1.5">
+                    Paying anonymously?
+                  </p>
+                  <p className="text-c-muted text-xs leading-relaxed">
+                    PayPal lets you hide your name when sending to a pool. If
+                    you do, please send{' '}
+                    <span className="text-c-white font-medium">
+                      {formData.invitedBy || 'your host'}
+                    </span>{' '}
+                    a quick message so we can match the payment to your RSVP —
+                    otherwise it stays unassigned and we&rsquo;ll have to chase
+                    you.
+                  </p>
+                </div>
                 {submitResult.bedFee === 0 && submitResult.venue !== 'Noch offen' && (
                   <p className="text-c-muted text-xs mt-3">
                     {submitResult.venue === 'Camping'
