@@ -1,5 +1,6 @@
 import { PageShell } from '@/components/page-shell'
 import { VideoHero } from '@/components/video-hero'
+import { VenueAccommodationList } from '@/components/venue-accommodation-list'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
@@ -7,9 +8,6 @@ import {
   MapPin,
   Car,
   Train,
-  BedDouble,
-  Tent,
-  Home,
   ExternalLink,
   Navigation,
   Clock,
@@ -331,64 +329,7 @@ export default function VenuePage() {
           weekend, on top of the &euro;100 event fee. Couples each pay individually.
         </p>
 
-        <div className="space-y-0">
-          {[
-            {
-              icon: BedDouble,
-              title: 'In the Castle',
-              desc: 'Around 90 beds — mostly shared rooms, some doubles, a few singles. We assign based on the full guest mix.',
-              tag: '€90 pp',
-            },
-            {
-              icon: Home,
-              title: 'Gelbes Haus',
-              desc: 'Village house, ~5 min from the castle. A 5-person room (two shared double beds + one single bed) plus a double room with a shared double bed.',
-              tag: '€75 pp',
-            },
-            {
-              icon: Home,
-              title: 'Schlosskrug',
-              desc: 'Village inn, ~5 min from the castle. Two double rooms, each with one shared double bed — perfect for a couple or close friends.',
-              tag: '€50 pp',
-            },
-            {
-              icon: Home,
-              title: 'Deichgraf Elbpension',
-              desc: 'Premium pension nearby, ~5 min from the castle. Two double rooms, each with one shared double bed.',
-              tag: '€123 pp',
-            },
-            {
-              icon: Tent,
-              title: 'Camping',
-              desc: 'Bring your tent or camper — plenty of space on the grounds. Castle bathrooms available.',
-              tag: 'Free',
-            },
-            {
-              icon: MapPin,
-              title: 'Self-arranged',
-              desc: 'Sort out your own bed (hotel, friend’s place, Airbnb). You only pay the event fee.',
-              tag: 'Self',
-            },
-          ].map((item, i, arr) => (
-            <div
-              key={item.title}
-              className={`flex items-start justify-between gap-4 py-7 ${
-                i < arr.length - 1 ? 'border-b border-c-border' : ''
-              }`}
-            >
-              <div className="flex items-start gap-4">
-                <item.icon className="text-c-gold shrink-0 mt-0.5" size={20} strokeWidth={1.5} />
-                <div>
-                  <h3 className="text-c-white font-semibold tracking-tight">{item.title}</h3>
-                  <p className="text-c-muted text-sm mt-1 leading-relaxed">{item.desc}</p>
-                </div>
-              </div>
-              <span className="text-c-gold font-mono text-xs tracking-wider shrink-0 mt-1">
-                {item.tag}
-              </span>
-            </div>
-          ))}
-        </div>
+        <VenueAccommodationList />
 
       </section>
 
