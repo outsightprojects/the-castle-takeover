@@ -190,8 +190,8 @@ export function HomeContent({ guestName }: { guestName?: string }) {
                 The sauna
               </h3>
               <p className="text-c-muted leading-relaxed">
-                Warm up after the lake, or just because. Towels
-                provided. One of those details that makes the
+                Warm up after the lake, or just because. Bring your
+                own towel. One of those details that makes the
                 weekend feel like a proper retreat.
               </p>
             </div>
@@ -228,7 +228,7 @@ export function HomeContent({ guestName }: { guestName?: string }) {
             { icon: Sparkles, title: 'The whole castle', desc: 'Sleep in it, wander it, explore the towers. It\u2019s ours from Friday to Sunday.' },
             { icon: Music, title: 'Music all weekend', desc: 'Courtyard sessions, cellar sets, music and DJs all weekend long.' },
             { icon: Wine, title: 'Plant-based feasts', desc: 'All meals are vegetarian & vegan \u2014 cooked properly, not as an afterthought. Plus a well-stocked bar.' },
-            { icon: TreePine, title: 'Lake & sauna', desc: 'Swim in the lake right next to the castle. Warm up in the sauna. Towels provided.' },
+            { icon: TreePine, title: 'Lake & sauna', desc: 'Swim in the lake right next to the castle. Warm up in the sauna. Bring your own towel.' },
             { icon: Users, title: 'Good people', desc: 'Friends from Berlin, London, New York and beyond. Everyone knows someone. No awkward small talk.' },
           ].map((item) => (
             <div key={item.title} className="p-8 md:p-10 bg-c-surface">
@@ -259,7 +259,7 @@ export function HomeContent({ guestName }: { guestName?: string }) {
           {[
             { icon: UtensilsCrossed, label: 'All food', detail: 'Provided throughout the weekend' },
             { icon: Wine, label: 'All drinks', detail: 'Open bar all weekend' },
-            { icon: Music, label: 'Music, DJs, sauna', detail: 'Courtyard sets, cellar parties, towels provided' },
+            { icon: Music, label: 'Music, DJs, sauna', detail: 'Courtyard sets, cellar parties, sauna sessions' },
             { icon: Sparkles, label: 'Cleaning, electricity, logistics', detail: 'Running a castle for three days has real costs' },
             { icon: Building, label: 'Castle rent & venues', detail: 'Settled through the bed fee — paid 1:1 to each venue' },
           ].map((item) => (

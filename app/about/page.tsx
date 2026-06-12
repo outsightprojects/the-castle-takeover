@@ -172,7 +172,7 @@ export default function AboutPage() {
             {
               icon: TreePine,
               title: 'Lake & sauna',
-              desc: 'Swim in the lake next to the castle. Warm up in the sauna. Towels provided.',
+              desc: 'Swim in the lake next to the castle. Warm up in the sauna. Bring your own towel.',
               accent: 'gold' as const,
             },
           ].map((item) => (
