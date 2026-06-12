@@ -41,7 +41,7 @@ export function HomeContent({ guestName }: { guestName?: string }) {
         src="/images/hero-loop.mp4"
         poster="/images/castle-exterior.jpeg"
       >
-        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-c-gold/8 to-transparent z-[1]" />
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-c-gold/8 to-transparent z-[1]" />
         <div className="px-6 md:px-8 pt-16 pb-24 md:pt-28 md:pb-40 max-w-5xl mx-auto text-center">
           <p className="font-mono text-[11px] md:text-xs tracking-[0.3em] uppercase text-c-gold/80 mb-3">
             28.08 &mdash; 30.08.2026 &middot; Schloss Dornburg
@@ -90,14 +90,14 @@ export function HomeContent({ guestName }: { guestName?: string }) {
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-14">
             <Link
               href="/tickets"
-              className="group inline-flex items-center justify-center gap-2 bg-c-gold text-c-black font-semibold px-10 py-4 rounded-none text-sm tracking-widest uppercase hover:bg-c-gold-light active:scale-[0.98] transition-all min-h-[48px]"
+              className="group inline-flex w-full sm:w-auto items-center justify-center gap-2 bg-c-gold text-c-black font-semibold px-10 py-4 rounded-none text-sm tracking-widest uppercase hover:bg-c-gold-light active:scale-[0.98] transition-all min-h-[48px]"
             >
               {isInvitation ? "I'm In" : "I'm In"}
               <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
             </Link>
             <Link
               href="/about"
-              className="inline-flex items-center justify-center gap-2 border border-c-white/20 text-c-white/80 font-semibold px-10 py-4 rounded-none text-sm tracking-widest uppercase hover:border-c-white/40 hover:text-c-white active:scale-[0.98] transition-all min-h-[48px]"
+              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 border border-c-white/20 text-c-white/80 font-semibold px-10 py-4 rounded-none text-sm tracking-widest uppercase hover:border-c-white/40 hover:text-c-white active:scale-[0.98] transition-all min-h-[48px]"
             >
               Tell Me More
             </Link>
