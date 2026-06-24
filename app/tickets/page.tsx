@@ -19,10 +19,27 @@ interface VenueStatus {
   available: number | null
 }
 
+// Per-Host-Kontingent fürs Schloss. Die /api/beds-Route liefert diese Werte
+// im `hosts`-Block (Quelle: lib/host-quota.ts). Das Schloss wird NICHT über die
+// flache Venue-Verfügbarkeit gated, sondern über das Kontingent des jeweiligen
+// Gastgebers — sonst sperrt eine schlossweite Null einzelne Hosts aus, die noch
+// freie Betten in ihrem Kontingent haben.
+interface HostStats {
+  castle_quota: number
+  castle_used: number
+  castle_available: number
+  castle_full: boolean
+  doubles_quota: number
+  doubles_used: number
+  doubles_available: number
+  doubles_full: boolean
+}
+
 interface BedData {
   venues: VenueStatus[]
   castle?: { total: number; taken: number; available: number }
   village?: { total: number; taken: number; available: number }
+  hosts?: Record<string, HostStats>
 }
 
 interface SubmitResult {
@@ -754,8 +771,21 @@ export default function RSVPPage() {
                     {ACCOMMODATION_OPTIONS.map((option) => {
                       const v = venueByApiName(option.apiName)
                       const price = v?.price ?? FALLBACK_PRICES[option.key] ?? 0
-                      const available = v?.available
-                      const total = v?.total
+
+                      // Schloss wird pro Gastgeber-Kontingent gated (Georg/Cari/Peter
+                      // teilen sich die Betten zu gleichen Teilen). Der Gast sieht die
+                      // Verfügbarkeit SEINES Hosts — nicht die schlossweite Summe, die
+                      // einzelne Hosts fälschlich aussperren würde. Ist der Host (noch)
+                      // nicht gewählt oder fehlen die Stats, bleibt das Schloss offen
+                      // (keine Sperre bei Unwissen) — die Server-Route prüft ohnehin nach.
+                      const hostStats =
+                        option.key === 'castle'
+                          ? beds?.hosts?.[formData.invitedBy]
+                          : undefined
+                      const available =
+                        option.key === 'castle' ? hostStats?.castle_available : v?.available
+                      const total =
+                        option.key === 'castle' ? hostStats?.castle_quota : v?.total
                       const isFull =
                         option.hasCapacity &&
                         available !== null &&
