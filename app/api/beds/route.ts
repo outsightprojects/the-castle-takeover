@@ -77,6 +77,13 @@ export async function GET() {
           total: castle.total ?? 0,
           taken: castle.taken,
           available: castle.available ?? 0,
+          // freeBeds = Schlossbetten mit Status "Available" (kein Gast zugewiesen),
+          // also tatsächlich frei buchbare Betten. Das Schloss wird im Frontend
+          // schlossweit über diese Zahl gated (für JEDEN Host), NICHT über die
+          // pro-Host-Kontingente und auch NICHT abzüglich pending-Zusagen: solange
+          // Notion freie Betten zeigt, ist das Schloss buchbar; bei 0 schließt es.
+          // Das Team weist Betten in Notion zu → freeBeds sinkt → Schloss schließt.
+          freeBeds: castle.total ?? 0,
         },
         village: {
           total: villageTotal,

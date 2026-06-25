@@ -37,7 +37,9 @@ interface HostStats {
 
 interface BedData {
   venues: VenueStatus[]
-  castle?: { total: number; taken: number; available: number }
+  // castle.freeBeds = schlossweit frei buchbare Betten (Status "Available").
+  // Das Schloss wird über diese Zahl gated — für jeden Host gleich.
+  castle?: { total: number; taken: number; available: number; freeBeds?: number }
   village?: { total: number; taken: number; available: number }
   hosts?: Record<string, HostStats>
 }
@@ -772,31 +774,35 @@ export default function RSVPPage() {
                       const v = venueByApiName(option.apiName)
                       const price = v?.price ?? FALLBACK_PRICES[option.key] ?? 0
 
-                      // Schloss wird pro Gastgeber-Kontingent gated (Georg/Cari/Peter
-                      // teilen sich die Betten zu gleichen Teilen). Der Gast sieht die
-                      // Verfügbarkeit SEINES Hosts — nicht die schlossweite Summe, die
-                      // einzelne Hosts fälschlich aussperren würde. Ist der Host (noch)
-                      // nicht gewählt oder fehlen die Stats, bleibt das Schloss offen
-                      // (keine Sperre bei Unwissen) — die Server-Route prüft ohnehin nach.
-                      const hostStats =
-                        option.key === 'castle'
-                          ? beds?.hosts?.[formData.invitedBy]
-                          : undefined
+                      // Schloss wird SCHLOSSWEIT über die frei buchbaren Betten gated —
+                      // für jeden Host gleich, nicht pro Gastgeber-Kontingent. Solange
+                      // Notion freie Schlossbetten zeigt (Status "Available"), ist das
+                      // Schloss für alle buchbar; bei 0 schließt es. Bewusst NICHT
+                      // abzüglich pending-Zusagen — das Team weist Betten in Notion zu,
+                      // wodurch die Zahl sinkt. Fehlt die Zahl (Laden/Fallback), bleibt
+                      // das Schloss offen; die Server-Route prüft beim Absenden erneut.
                       const available =
-                        option.key === 'castle' ? hostStats?.castle_available : v?.available
+                        option.key === 'castle' ? beds?.castle?.freeBeds : v?.available
                       const total =
-                        option.key === 'castle' ? hostStats?.castle_quota : v?.total
+                        option.key === 'castle' ? beds?.castle?.freeBeds : v?.total
                       const isFull =
                         option.hasCapacity &&
                         available !== null &&
                         available !== undefined &&
                         available <= 0
 
-                      const availText = option.hasCapacity
-                        ? available !== null && available !== undefined && total !== null && total !== undefined
-                          ? `${available}/${total}`
-                          : null
-                        : null
+                      // Schloss: nur die freie-Betten-Zahl ("N left"), da es kein
+                      // sinnvolles Gesamt-Kontingent zum Anzeigen gibt. Pensionen
+                      // behalten das "frei/gesamt"-Format.
+                      const availText = !option.hasCapacity
+                        ? null
+                        : option.key === 'castle'
+                          ? available !== null && available !== undefined
+                            ? `${available} left`
+                            : null
+                          : available !== null && available !== undefined && total !== null && total !== undefined
+                            ? `${available}/${total}`
+                            : null
 
                       const priceText: string | null =
                         option.key === 'self'
